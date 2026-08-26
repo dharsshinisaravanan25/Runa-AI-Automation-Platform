@@ -16,6 +16,7 @@ import CustomNode from '../../components/WorkflowCanvas/CustomNode';
 import WorkflowToolbar from '../../components/WorkflowCanvas/WorkflowToolbar';
 import NodePalette from '../../components/NodePalette/NodePalette';
 import NodeConfigPanel from '../../components/NodeConfigPanel/NodeConfigPanel';
+import CanvasCopilot from '../../components/WorkflowCanvas/CanvasCopilot';
 import api from '../../services/api';
 import { getSocket } from '../../services/socket';
 import { Loader2, Terminal, Play, Sparkles, Send, MessageCircle } from 'lucide-react';
@@ -214,6 +215,17 @@ export default function WorkflowCanvasPage() {
     }
   };
 
+  const handleApplyGraphUpdate = (newNodes, newEdges) => {
+    setNodes(newNodes);
+    setEdges(
+      (newEdges || []).map((e) => ({
+        ...e,
+        animated: true,
+        style: { stroke: '#6366F1', strokeWidth: 2 }
+      }))
+    );
+  };
+
   return (
     <ProtectedRoute>
       <Layout>
@@ -273,6 +285,14 @@ export default function WorkflowCanvasPage() {
                 </button>
               </div>
             )}
+
+            {/* AI Canvas Co-Pilot Floating Assistant */}
+            <CanvasCopilot
+              workflowId={id}
+              currentNodes={nodes}
+              currentEdges={edges}
+              onApplyGraphUpdate={handleApplyGraphUpdate}
+            />
 
             {loading ? (
               <div className="h-full flex items-center justify-center text-slate-400">
