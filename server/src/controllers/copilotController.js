@@ -24,7 +24,7 @@ class CopilotController {
 
       const prompt = message.trim();
 
-      const systemPrompt = `You are the RUNA AI Canvas Co-Pilot, an intelligent pair-programmer and workflow architect.
+      const systemPrompt = `You are Runa Assist, an intelligent autonomous workflow co-pilot and pair-architect for the RUNA operations platform.
 The user is currently editing a visual React Flow workflow graph on their screen.
 
 CURRENT WORKFLOW GRAPH ON USER'S SCREEN:
@@ -50,7 +50,7 @@ YOUR INSTRUCTIONS:
    - Return updated \`nodes\` and \`edges\` arrays.
    - Ensure nodes have distinct IDs (e.g. \`node_\${Date.now()}\`), position { x, y } placed logically (x spaced by ~320px), and valid data { label, category, icon, provider, action, config }.
    - Ensure edges correctly connect source -> target.
-2. Provide a helpful, concise explanation of the change in \`reply\`.
+2. Provide a helpful, concise explanation of the change in \`reply\` signed as Runa Assist.
 3. If the user is only asking a question or seeking advice, keep nodes and edges unchanged and provide a friendly, insightful answer.
 
 Output must strictly be valid JSON matching:
@@ -213,7 +213,7 @@ Output must strictly be valid JSON matching:
 
     // 4. General Assistance
     return {
-      reply: `🤖 I'm your RUNA Canvas Co-Pilot. You currently have ${nodes.length} nodes configured. You can ask me to add WhatsApp, Telegram, LinkedIn, Instagram, or Sheets nodes, or wire steps together automatically!`,
+      reply: `🤖 I'm Runa Assist, your autonomous workflow co-pilot. You currently have ${nodes.length} nodes configured. You can ask me to add WhatsApp, Telegram, LinkedIn, Instagram, or Sheets nodes, or wire steps together automatically!`,
       actionTaken: 'CHAT_REPLY',
       nodes,
       edges

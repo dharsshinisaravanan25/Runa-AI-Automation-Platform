@@ -34,7 +34,7 @@ export default function CanvasCopilot({
     {
       id: 'welcome',
       sender: 'copilot',
-      text: '👋 Hi! I am your RUNA Canvas Co-Pilot. Tell me what steps to add, connect, or configure and I will modify your canvas in real time!',
+      text: '👋 Hi! I am Runa Assist, your autonomous workflow co-pilot. Tell me what steps to add, connect, or configure and I will modify your canvas in real time!',
       timestamp: new Date()
     }
   ]);
@@ -89,7 +89,7 @@ export default function CanvasCopilot({
 
         setMessages((prev) => [...prev, copilotMsg]);
 
-        // If the Co-Pilot updated the graph, apply to React Flow state!
+        // If Runa Assist updated the graph, apply to React Flow state!
         if (data.actionTaken === 'GRAPH_UPDATED' && data.nodes && onApplyGraphUpdate) {
           onApplyGraphUpdate(data.nodes, data.edges || currentEdges);
           setLastAction('Graph updated on canvas');
@@ -101,7 +101,7 @@ export default function CanvasCopilot({
         {
           id: `error_${Date.now()}`,
           sender: 'copilot',
-          text: `⚠️ Co-Pilot error: ${err.response?.data?.error?.message || err.message}`,
+          text: `⚠️ Runa Assist error: ${err.response?.data?.error?.message || err.message}`,
           isError: true,
           timestamp: new Date()
         }
@@ -122,7 +122,7 @@ export default function CanvasCopilot({
           <div className="p-1 rounded-lg bg-white/20">
             <Sparkles className="w-4 h-4 text-white animate-pulse" />
           </div>
-          <span className="tracking-wide font-bold">✨ AI Canvas Co-Pilot</span>
+          <span className="tracking-wide font-bold">✨ Runa Assist</span>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
         </button>
       )}
@@ -138,12 +138,12 @@ export default function CanvasCopilot({
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                  <span>RUNA AI Co-Pilot</span>
+                  <span>Runa Assist</span>
                   <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
                     Live
                   </span>
                 </h4>
-                <p className="text-[10px] text-slate-400">Pair-programming on canvas</p>
+                <p className="text-[10px] text-slate-400">Autonomous workflow pair-architect</p>
               </div>
             </div>
 
@@ -200,7 +200,7 @@ export default function CanvasCopilot({
                 </div>
                 <div className="rounded-2xl p-3 bg-slate-50 text-slate-500 border border-slate-200/80 flex items-center gap-2 text-xs">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-indigo-600" />
-                  <span>Modifying graph...</span>
+                  <span>Runa Assist modifying graph...</span>
                 </div>
               </div>
             )}
@@ -231,7 +231,7 @@ export default function CanvasCopilot({
           >
             <input
               type="text"
-              placeholder="e.g. Add WhatsApp node for +91..."
+              placeholder="Ask Runa Assist (e.g. Add WhatsApp node)..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
