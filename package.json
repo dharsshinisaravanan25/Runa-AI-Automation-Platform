@@ -1,18 +1,20 @@
 {
-  "name": "agentflow-ai",
-  "version": "1.0.0",
-  "description": "Agentic AI Operations Automation Platform (Agentflow_AI)",
+  "name": "runa-platform",
+  "version": "3.0.0",
+  "description": "RUNA - Autonomous Agentic AI Operations Platform (You define it. We run it.)",
   "private": true,
   "scripts": {
     "dev": "node run-dev.js",
     "dev:server": "cd server && npm run dev",
     "dev:client": "cd client && npm run dev",
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build": "cd client && npm install && npm run build",
     "build:client": "cd client && npm run build",
     "start:server": "cd server && npm start",
     "start:client": "cd client && npm start"
   },
   "keywords": [
+    "runa",
     "agentic-ai",
     "automation",
     "workflow",
@@ -21,6 +23,6 @@
     "multi-agent",
     "operations"
   ],
-  "author": "Antigravity Engineering",
+  "author": "RUNA Engineering",
   "license": "MIT"
 }
