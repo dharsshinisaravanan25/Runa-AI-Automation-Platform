@@ -204,6 +204,17 @@ export default function ExecutionTracePage() {
 
             {/* Controls */}
             <div className="flex items-center gap-2">
+              {execution?.workflow && (
+                <button
+                  onClick={() => router.push(`/workflows/${execution.workflow._id || execution.workflow}`)}
+                  className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold text-xs border border-indigo-200 transition shadow-soft-sm"
+                  title="Open in Visual Canvas"
+                >
+                  <GitBranch className="w-3.5 h-3.5" />
+                  <span>Edit Canvas</span>
+                </button>
+              )}
+
               {execution?.status === 'RUNNING' && (
                 <button
                   onClick={handlePause}
