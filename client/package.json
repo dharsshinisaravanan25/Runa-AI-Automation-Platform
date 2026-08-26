@@ -1,7 +1,7 @@
 {
-  "name": "agentflow-ai-client",
-  "version": "1.0.0",
-  "description": "Frontend console and React Flow canvas for Agentflow_AI",
+  "name": "runa-ai-client",
+  "version": "3.0.0",
+  "description": "Frontend console and React Flow canvas for RUNA AI",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000",
@@ -15,7 +15,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.4.3",
     "lucide-react": "^0.475.0",
-    "next": "15.1.7",
+    "next": "^15.2.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "socket.io-client": "^4.8.1",
