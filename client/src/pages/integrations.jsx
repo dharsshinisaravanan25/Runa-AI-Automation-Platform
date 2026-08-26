@@ -17,10 +17,69 @@ import {
   Key,
   Radio,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
 const INTEGRATION_DEFINITIONS = [
+  {
+    id: 'whatsapp',
+    name: 'WhatsApp Business API',
+    icon: MessageCircle,
+    category: 'Direct Messaging',
+    description: 'Dispatch instant customer alerts, OTP notifications, and multi-agent customer service replies.',
+    scopes: ['whatsapp_business_messaging', 'whatsapp_business_management'],
+    hasOAuth: false
+  },
+  {
+    id: 'telegram',
+    name: 'Telegram Bot API',
+    icon: Send,
+    category: 'Incident & Broadcast',
+    description: 'Post automated channel broadcasts, war room alerts, and interactive bot commands via @BotFather.',
+    scopes: ['bot_api'],
+    hasOAuth: false
+  },
+  {
+    id: 'linkedin',
+    name: 'LinkedIn Marketing & Outreach',
+    icon: Linkedin,
+    category: 'Social & Growth',
+    description: 'Auto-publish AI-generated thought leadership, executive articles, and lead generation inMails.',
+    scopes: ['w_member_social', 'r_liteprofile'],
+    hasOAuth: true
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram Graph API',
+    icon: Instagram,
+    category: 'Social & Media',
+    description: 'Schedule reels, auto-post carousel captions, and trigger smart auto-replies to incoming DMs.',
+    scopes: ['instagram_basic', 'instagram_content_publish'],
+    hasOAuth: true
+  },
+  {
+    id: 'facebook',
+    name: 'Facebook Pages & Lead Ads',
+    icon: Facebook,
+    category: 'Social & Ads',
+    description: 'Auto-post company announcements, process Facebook Lead Ad form submissions, and manage pages.',
+    scopes: ['pages_manage_posts', 'leads_retrieval'],
+    hasOAuth: true
+  },
+  {
+    id: 'google-sheets',
+    name: 'Google Sheets DB',
+    icon: Table,
+    category: 'Data Persistence',
+    description: 'Append real-time audit rows, update operational ranges, and sync customer registries.',
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    hasOAuth: true
+  },
   {
     id: 'gmail',
     name: 'Gmail API Vault',
@@ -40,38 +99,11 @@ const INTEGRATION_DEFINITIONS = [
     hasOAuth: true
   },
   {
-    id: 'discord',
-    name: 'Discord Webhook & Bot',
-    icon: Bot,
-    category: 'Operations & Alerts',
-    description: 'Trigger instant channel broadcasts, rich embeds, and incident war room notifications.',
-    scopes: ['bot', 'webhook.incoming'],
-    hasOAuth: false
-  },
-  {
-    id: 'google-sheets',
-    name: 'Google Sheets DB',
-    icon: Table,
-    category: 'Data Persistence',
-    description: 'Append real-time audit rows, update operational ranges, and read customer registries.',
-    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-    hasOAuth: true
-  },
-  {
-    id: 'openrouter',
-    name: 'OpenRouter Multi-LLM',
-    icon: Sparkles,
-    category: 'AI Model Fabric',
-    description: 'Access Claude 3.5 Sonnet, Llama 3.3 70B, and DeepSeek via unified API key.',
-    scopes: ['api_key'],
-    hasOAuth: false
-  },
-  {
     id: 'gemini',
-    name: 'Google Gemini SDK',
+    name: 'Google Gemini 2.5 Flash',
     icon: Sparkles,
-    category: 'AI Multimodal',
-    description: 'High-speed reasoning, vision analysis, and structured extraction with Gemini 1.5 Pro/Flash.',
+    category: 'AI Multimodal Fabric',
+    description: 'Multimodal reasoning, fast code extraction, and structured graph synthesis with Gemini 2.5 Flash.',
     scopes: ['gemini_api_key'],
     hasOAuth: false
   }
@@ -164,14 +196,14 @@ export default function IntegrationsPage() {
                 Integrations Vault
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Connect external apps and AI providers with AES-256-GCM token encryption
+                Connect **WhatsApp, Telegram, LinkedIn, Instagram, Facebook, Sheets & Gemini** with AES-256-GCM token encryption
               </p>
             </div>
 
             {/* Cryptographic Health Badge */}
             <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 border border-emerald-200 text-xs font-semibold text-emerald-800 shadow-soft-sm">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>AES-256 Encryption Active</span>
+              <span>AES-256 Vault Active</span>
             </div>
           </div>
 
@@ -252,7 +284,7 @@ export default function IntegrationsPage() {
                           onClick={() => handleOAuthConnect(item.id)}
                           className="px-3 py-1.5 rounded-xl bg-indigo-50 hover:bg-indigo-600 text-indigo-700 hover:text-white font-semibold text-xs transition border border-indigo-100 shadow-soft-sm"
                         >
-                          Connect OAuth
+                          OAuth
                         </button>
                       )}
 
@@ -289,22 +321,22 @@ export default function IntegrationsPage() {
 
                 <form onSubmit={handleSaveManual} className="space-y-3.5 text-xs">
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">API Key / Access Token</label>
+                    <label className="block text-slate-700 font-semibold mb-1">API Key / Access Token / Bot Token</label>
                     <input
                       type="password"
                       required
-                      placeholder="e.g. sk-live-..., xoxb-..., or webhook URL"
-                      value={manualCredentials.accessToken || manualCredentials.apiKey || manualCredentials.webhookUrl || ''}
-                      onChange={(e) => setManualCredentials({ ...manualCredentials, accessToken: e.target.value, apiKey: e.target.value, webhookUrl: e.target.value })}
+                      placeholder="e.g. EAAG..., 61829384:AA..., sk-live-..., or webhook URL"
+                      value={manualCredentials.accessToken || manualCredentials.apiKey || manualCredentials.botToken || ''}
+                      onChange={(e) => setManualCredentials({ ...manualCredentials, accessToken: e.target.value, apiKey: e.target.value, botToken: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-slate-700 font-semibold mb-1">Account Identifier / Email</label>
+                    <label className="block text-slate-700 font-semibold mb-1">Account Identifier / Email / Phone ID</label>
                     <input
                       type="text"
-                      placeholder="e.g. integration@company.com"
+                      placeholder="e.g. +1234567890, @bot_handle, or user@company.com"
                       value={manualCredentials.accountEmail || ''}
                       onChange={(e) => setManualCredentials({ ...manualCredentials, accountEmail: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
@@ -324,7 +356,7 @@ export default function IntegrationsPage() {
                       disabled={savingKey}
                       className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-md shadow-indigo-100"
                     >
-                      {savingKey ? 'Encrypting...' : 'Save Credentials'}
+                      {savingKey ? 'Encrypting...' : 'Save to Vault'}
                     </button>
                   </div>
                 </form>

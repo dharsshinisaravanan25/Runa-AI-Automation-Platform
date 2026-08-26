@@ -50,7 +50,7 @@ export default function SettingsPage() {
               Settings & System Health
             </h2>
             <p className="text-xs text-slate-500 mt-1">
-              Operator profile, AES-256 vault status, and substrate diagnostics
+              RUNA operator profile, AES-256 vault status, and substrate diagnostics • <span className="italic">"You define it. We run it."</span>
             </p>
           </div>
 
@@ -81,7 +81,7 @@ export default function SettingsPage() {
                   Email Address
                 </span>
                 <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-medium">
-                  {user?.email || 'operator@agentra.ai'}
+                  {user?.email || 'operator@runa.ai'}
                 </div>
               </div>
 
@@ -114,7 +114,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <h3 className="text-sm font-bold text-slate-900">System Diagnostics</h3>
-                <p className="text-xs text-slate-400">Database and execution substrate telemetry</p>
+                <p className="text-xs text-slate-400">Database, Gemini 2.5 Flash, and execution substrate telemetry</p>
               </div>
             </div>
 

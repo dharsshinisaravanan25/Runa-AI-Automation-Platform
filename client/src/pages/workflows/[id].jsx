@@ -18,7 +18,7 @@ import NodePalette from '../../components/NodePalette/NodePalette';
 import NodeConfigPanel from '../../components/NodeConfigPanel/NodeConfigPanel';
 import api from '../../services/api';
 import { getSocket } from '../../services/socket';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Terminal, Play, Sparkles, Send, MessageCircle } from 'lucide-react';
 
 const nodeTypes = {
   custom: CustomNode
@@ -36,6 +36,10 @@ export default function WorkflowCanvasPage() {
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+
+  // Quick In-App Sandbox Trigger
+  const [showSandbox, setShowSandbox] = useState(false);
+  const [testPayload, setTestPayload] = useState('{\n  "source": "lead_webhook",\n  "name": "Sarah Jenkins",\n  "company": "Nexus Corp",\n  "intent": "High Priority Enterprise"\n}');
 
   const reactFlowWrapper = useRef(null);
   const [reactFlowInstance, setReactFlowInstance] = useState(null);
@@ -184,15 +188,22 @@ export default function WorkflowCanvasPage() {
     }
   };
 
-  const handleExecute = async () => {
+  const handleExecute = async (customPayload = null) => {
     if (!id) return;
     try {
       setIsExecuting(true);
       await handleSave();
 
-      const res = await api.post(`/workflows/${id}/execute`, {
-        inputs: { initiatedBy: 'canvas_operator' }
-      });
+      let inputs = { initiatedBy: 'canvas_operator' };
+      if (customPayload) {
+        try {
+          inputs = JSON.parse(customPayload);
+        } catch (e) {
+          inputs = { raw: customPayload };
+        }
+      }
+
+      const res = await api.post(`/workflows/${id}/execute`, { inputs });
       const execution = res.data?.data?.execution;
       if (execution && execution._id) {
         router.push(`/executions/${execution._id}`);
@@ -216,11 +227,52 @@ export default function WorkflowCanvasPage() {
               workflowName={workflowName}
               onNameChange={setWorkflowName}
               onSave={handleSave}
-              onExecute={handleExecute}
+              onExecute={() => handleExecute()}
               isSaving={isSaving}
               isExecuting={isExecuting}
               nodeCount={nodes.length}
             />
+
+            {/* Quick In-App Sandbox Trigger Pill */}
+            <div className="absolute bottom-6 left-6 z-20">
+              <button
+                onClick={() => setShowSandbox(!showSandbox)}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-slate-200 text-xs font-semibold text-slate-700 shadow-soft-md hover:bg-slate-50 transition"
+              >
+                <Terminal className="w-4 h-4 text-indigo-600" />
+                <span>Test Event Sandbox</span>
+              </button>
+            </div>
+
+            {/* In-App Test Event Modal Drawer */}
+            {showSandbox && (
+              <div className="absolute bottom-20 left-6 z-30 w-96 rounded-3xl bg-white border border-slate-200 p-5 shadow-soft-xl space-y-3 font-sans">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                  <div className="flex items-center gap-2">
+                    <Terminal className="w-4 h-4 text-indigo-600" />
+                    <h4 className="text-xs font-bold text-slate-900">Simulate Inbound Event Payload</h4>
+                  </div>
+                  <button onClick={() => setShowSandbox(false)} className="text-slate-400 hover:text-slate-700 text-xs">✕</button>
+                </div>
+                <textarea
+                  rows={4}
+                  value={testPayload}
+                  onChange={(e) => setTestPayload(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-mono text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 resize-none"
+                />
+                <button
+                  onClick={() => {
+                    setShowSandbox(false);
+                    handleExecute(testPayload);
+                  }}
+                  disabled={isExecuting}
+                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-soft-sm"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Execute RUNA Swarm with Payload</span>
+                </button>
+              </div>
+            )}
 
             {loading ? (
               <div className="h-full flex items-center justify-center text-slate-400">

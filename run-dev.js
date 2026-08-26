@@ -1,5 +1,6 @@
 /**
- * Agentra AI - Multi-Agent Operations Platform Runner
+ * RUNA - Autonomous Agentic AI Operations Platform Runner
+ * Tagline: (You define it. We run it.)
  * Launches both Express Backend and Next.js Frontend concurrently with colored logging
  */
 
@@ -17,11 +18,11 @@ const green = (text) => `\x1b[32m${text}\x1b[0m`;
 const bold = (text) => `\x1b[1m${text}\x1b[0m`;
 
 console.log('\n' + cyan('========================================================================'));
-console.log(bold(green('   ⚡ Agentra // Autonomous Agentic AI Operations Platform   ')));
+console.log(bold(green('   ⚡ RUNA // Autonomous Operations (You define it. We run it.)   ')));
 console.log(cyan('========================================================================\n'));
 console.log(`  🌐 Frontend:  ${bold('http://localhost:3000')}`);
 console.log(`  ⚙️  Backend:   ${bold('http://localhost:5000')}`);
-console.log(`  🔑 Demo User: ${bold('operator@agentra.ai')} / ${bold('Operator123!')}\n`);
+console.log(`  🔑 Demo User: ${bold('operator@runa.ai')} / ${bold('Operator123!')}\n`);
 console.log(cyan('------------------------------------------------------------------------\n'));
 
 const isWindows = process.platform === 'win32';
@@ -39,7 +40,7 @@ serverProcess.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
     if (line.trim()) {
-      console.log(`${cyan('[AGENTRA-SERVER]')} ${line}`);
+      console.log(`${cyan('[RUNA-SERVER]')} ${line}`);
     }
   });
 });
@@ -48,7 +49,7 @@ serverProcess.stderr.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
     if (line.trim()) {
-      console.error(`${cyan('[AGENTRA-SERVER:ERR]')} ${line}`);
+      console.error(`${cyan('[RUNA-SERVER:ERR]')} ${line}`);
     }
   });
 });
@@ -65,7 +66,7 @@ clientProcess.stdout.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
     if (line.trim()) {
-      console.log(`${magenta('[AGENTRA-CLIENT]')} ${line}`);
+      console.log(`${magenta('[RUNA-CLIENT]')} ${line}`);
     }
   });
 });
@@ -74,14 +75,14 @@ clientProcess.stderr.on('data', (data) => {
   const lines = data.toString().split('\n');
   lines.forEach((line) => {
     if (line.trim()) {
-      console.error(`${magenta('[AGENTRA-CLIENT:ERR]')} ${line}`);
+      console.error(`${magenta('[RUNA-CLIENT:ERR]')} ${line}`);
     }
   });
 });
 
 // Clean shutdown on Ctrl+C
 const cleanup = () => {
-  console.log('\n' + green('Shutting down Agentra AI services gracefully...'));
+  console.log('\n' + green('Shutting down RUNA AI services gracefully...'));
   try {
     if (isWindows) {
       if (serverProcess.pid) spawn('taskkill', ['/pid', serverProcess.pid, '/f', '/t']);

@@ -6,6 +6,9 @@ const slackIntegration = require('../integrations/slackIntegration');
 const discordIntegration = require('../integrations/discordIntegration');
 const googleSheetsIntegration = require('../integrations/googleSheetsIntegration');
 const aiIntegration = require('../integrations/aiIntegration');
+const whatsappIntegration = require('../integrations/whatsappIntegration');
+const telegramIntegration = require('../integrations/telegramIntegration');
+const socialIntegration = require('../integrations/socialIntegration');
 
 // AES-256-GCM Encryption utilities
 const ALGORITHM = 'aes-256-gcm';
@@ -61,11 +64,16 @@ class IntegrationService {
       slack: slackIntegration,
       discord: discordIntegration,
       'google-sheets': googleSheetsIntegration,
-      ai: aiIntegration
+      ai: aiIntegration,
+      whatsapp: whatsappIntegration,
+      telegram: telegramIntegration
     };
   }
 
   getProviderHandler(provider) {
+    if (provider === 'linkedin' || provider === 'instagram' || provider === 'facebook') {
+      return socialIntegration;
+    }
     const handler = this.providers[provider];
     if (!handler) {
       throw new Error(`Unsupported integration provider: ${provider}`);
@@ -76,12 +84,16 @@ class IntegrationService {
   async listUserIntegrations(userId) {
     const records = await db.Integration.find({ owner: userId });
     const allProviders = [
-      { id: 'gmail', name: 'Gmail', icon: 'Mail', description: 'Send and read email messages & triggers' },
-      { id: 'slack', name: 'Slack', icon: 'MessageSquare', description: 'Post alerts, rich blocks, & channel updates' },
-      { id: 'discord', name: 'Discord', icon: 'Bot', description: 'Post webhook messages & server announcements' },
-      { id: 'google-sheets', name: 'Google Sheets', icon: 'Table', description: 'Append rows, read data ranges, & sync sheets' },
-      { id: 'openrouter', name: 'OpenRouter AI', icon: 'Cpu', description: 'Multi-model LLM inference (Llama, Claude, DeepSeek)' },
-      { id: 'gemini', name: 'Google Gemini', icon: 'Sparkles', description: 'Google Multimodal Generative AI SDK' }
+      { id: 'whatsapp', name: 'WhatsApp Business API', icon: 'MessageCircle', description: 'Dispatch templates, OTPs, and direct customer messages' },
+      { id: 'telegram', name: 'Telegram Bot API', icon: 'Send', description: 'Group alerts, bot commands, and channel broadcasts' },
+      { id: 'linkedin', name: 'LinkedIn Marketing & Outreach', icon: 'Linkedin', description: 'Auto-publish articles, executive updates, and lead outreach' },
+      { id: 'instagram', name: 'Instagram Graph API', icon: 'Instagram', description: 'Auto-post captions, reels, and smart DM replies' },
+      { id: 'facebook', name: 'Facebook Graph API', icon: 'Facebook', description: 'Page broadcasts, messenger automation, and lead ad processing' },
+      { id: 'gmail', name: 'Gmail API Vault', icon: 'Mail', description: 'Send and read email messages & incoming triggers' },
+      { id: 'slack', name: 'Slack Bot Workspace', icon: 'MessageSquare', description: 'Post alerts, rich blocks, & war room updates' },
+      { id: 'discord', name: 'Discord Webhook & Bot', icon: 'Bot', description: 'Post webhook messages & server announcements' },
+      { id: 'google-sheets', name: 'Google Sheets DB', icon: 'Table', description: 'Append rows, read data ranges, & sync sheets' },
+      { id: 'gemini', name: 'Google Gemini SDK', icon: 'Sparkles', description: 'Google Gemini 2.5 Flash Multimodal Generative AI' }
     ];
 
     const result = allProviders.map(p => {
@@ -95,7 +107,7 @@ class IntegrationService {
         icon: p.icon,
         description: p.description,
         isConnected: isConnected && !isExpired,
-        accountEmail: record?.accountEmail || (isConnected ? 'connected@agentflow.ai' : null),
+        accountEmail: record?.accountEmail || (isConnected ? 'connected@runa.ai' : null),
         accountName: record?.accountName || null,
         scopes: record?.scopes || [],
         expiresAt: record?.expiresAt || null,
@@ -218,20 +230,31 @@ class IntegrationService {
       };
     }
 
-    // 2. Treat AI as self-contained or load user keys
+    // 2. AI Providers
     if (provider === 'ai' || provider === 'openrouter' || provider === 'gemini') {
       const credentials = await this.getDecryptedCredentials(userId, provider);
       return await aiIntegration.executeAction(action, params, credentials);
     }
 
+    // 3. Social Providers (LinkedIn, Instagram, Facebook)
+    if (provider === 'linkedin' || provider === 'instagram' || provider === 'facebook') {
+      const credentials = await this.getDecryptedCredentials(userId, provider);
+      return await socialIntegration.executeSocial(provider, action, params, credentials || { apiKey: 'mock_social_key' });
+    }
+
+    // 4. Messaging & Apps (WhatsApp, Telegram, Gmail, Slack, Discord, Sheets)
     const handler = this.getProviderHandler(provider);
     const credentials = await this.getDecryptedCredentials(userId, provider);
 
-    // If not connected and no credentials, we allow mock sandbox execution or throw INTEGRATION_NOT_CONNECTED
-    return await handler.executeAction(action, params, credentials || { accessToken: 'mock_sandbox_token' });
+    return await handler.execute(action, params, credentials || { accessToken: 'mock_sandbox_token' });
   }
 
   async testProviderConnection(userId, provider) {
+    if (provider === 'linkedin' || provider === 'instagram' || provider === 'facebook') {
+      const credentials = await this.getDecryptedCredentials(userId, provider);
+      return await socialIntegration.testConnection(provider, credentials || { apiKey: 'mock_social_key' });
+    }
+
     const handler = this.getProviderHandler(provider);
     const credentials = await this.getDecryptedCredentials(userId, provider);
     return await handler.testConnection(credentials || { accessToken: 'mock_sandbox_token' });

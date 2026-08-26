@@ -45,20 +45,20 @@ export default function RegisterPage() {
         <div className="text-center mb-8">
           <div 
             onClick={() => router.push('/')}
-            className="inline-flex items-center gap-2.5 cursor-pointer group mb-3"
+            className="inline-flex items-center gap-2.5 cursor-pointer group mb-2"
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform">
               <Zap className="w-6 h-6 text-white fill-current" />
             </div>
             <div className="text-left">
-              <span className="font-bold text-2xl text-slate-900 tracking-tight block">Agentra</span>
-              <p className="text-xs text-slate-500 font-medium">Autonomous Operations</p>
+              <span className="font-extrabold text-2xl text-slate-900 tracking-tight block">RUNA</span>
+              <p className="text-xs text-slate-500 font-medium italic">You define it. We run it.</p>
             </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-2">
             Create an account
           </h2>
-          <p className="text-xs text-slate-500 mt-1">Get started with autonomous workflow orchestration</p>
+          <p className="text-xs text-slate-500 mt-1">Get started with RUNA autonomous agentic swarms</p>
         </div>
 
         {/* Card */}
@@ -97,7 +97,7 @@ export default function RegisterPage() {
                 <input
                   type="email"
                   required
-                  placeholder="alex@agentra.ai"
+                  placeholder="alex@runa.ai"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"

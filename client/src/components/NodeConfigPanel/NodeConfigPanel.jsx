@@ -6,7 +6,12 @@ import {
   HelpCircle,
   Code2,
   Sliders,
-  ChevronRight
+  ChevronRight,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
 export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
@@ -33,7 +38,7 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
   };
 
   return (
-    <aside className="w-80 bg-white border-l border-slate-200 flex flex-col shrink-0 select-none z-20 font-sans shadow-soft-md">
+    <aside className="w-84 bg-white border-l border-slate-200 flex flex-col shrink-0 select-none z-20 font-sans shadow-soft-md">
       {/* Header */}
       <div className="p-4 border-b border-slate-100 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -73,7 +78,135 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
           />
         </div>
 
-        {/* Dynamic Config Fields */}
+        {/* WhatsApp Fields */}
+        {data.provider === 'whatsapp' && (
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Recipient Phone Number (E.164 format)</label>
+              <input
+                type="text"
+                value={config.to || ''}
+                onChange={(e) => handleFieldChange('to', e.target.value)}
+                placeholder="+1 (555) 019-2834"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">WhatsApp Message Body</label>
+              <textarea
+                rows={3}
+                value={config.message || ''}
+                onChange={(e) => handleFieldChange('message', e.target.value)}
+                placeholder="Supports {{nodes.<id>.output}} interpolation"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Telegram Fields */}
+        {data.provider === 'telegram' && (
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Telegram Chat ID / Channel (@handle)</label>
+              <input
+                type="text"
+                value={config.chatId || ''}
+                onChange={(e) => handleFieldChange('chatId', e.target.value)}
+                placeholder="@runa_ops_channel or -10012345678"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Telegram Alert Text</label>
+              <textarea
+                rows={3}
+                value={config.message || ''}
+                onChange={(e) => handleFieldChange('message', e.target.value)}
+                placeholder="Alert text (Markdown enabled)..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
+              />
+            </div>
+          </>
+        )}
+
+        {/* LinkedIn Fields */}
+        {data.provider === 'linkedin' && (
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Author Profile / Company Page</label>
+              <input
+                type="text"
+                value={config.author || 'Executive Profile'}
+                onChange={(e) => handleFieldChange('author', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">LinkedIn Post Content</label>
+              <textarea
+                rows={4}
+                value={config.text || config.content || ''}
+                onChange={(e) => handleFieldChange('text', e.target.value)}
+                placeholder="Write your thought leadership post or reference {{nodes.node_2.output}}..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Instagram Fields */}
+        {data.provider === 'instagram' && (
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Media / Image URL</label>
+              <input
+                type="text"
+                value={config.mediaUrl || ''}
+                onChange={(e) => handleFieldChange('mediaUrl', e.target.value)}
+                placeholder="https://images.unsplash.com/..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Instagram Caption & Hashtags</label>
+              <textarea
+                rows={3}
+                value={config.caption || ''}
+                onChange={(e) => handleFieldChange('caption', e.target.value)}
+                placeholder="Caption with hashtags: #AI #RUNA #Operations"
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Facebook Fields */}
+        {data.provider === 'facebook' && (
+          <>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Facebook Page ID / Target</label>
+              <input
+                type="text"
+                value={config.pageId || 'RUNA_Official_Page'}
+                onChange={(e) => handleFieldChange('pageId', e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Facebook Post Text</label>
+              <textarea
+                rows={3}
+                value={config.message || ''}
+                onChange={(e) => handleFieldChange('message', e.target.value)}
+                placeholder="Post content for Facebook followers..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
+              />
+            </div>
+          </>
+        )}
+
+        {/* Webhook Fields */}
         {data.provider === 'webhook' && (
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Webhook Endpoint Path</label>
@@ -86,6 +219,7 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
           </div>
         )}
 
+        {/* Gmail Fields */}
         {data.provider === 'gmail' && data.action === 'read_inbox' && (
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Search Query / Filter</label>
@@ -99,6 +233,7 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
           </div>
         )}
 
+        {/* AI Fields */}
         {data.provider === 'ai' && (
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">AI Prompt & Instructions</label>
@@ -106,12 +241,13 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
               rows={4}
               value={config.prompt || ''}
               onChange={(e) => handleFieldChange('prompt', e.target.value)}
-              placeholder="e.g. Extract key entities from input text"
+              placeholder="e.g. Extract key entities from input text or generate a viral post..."
               className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-900 focus:outline-none focus:bg-white focus:border-indigo-500 transition leading-relaxed resize-none"
             />
           </div>
         )}
 
+        {/* Slack Fields */}
         {data.provider === 'slack' && (
           <>
             <div>
@@ -136,6 +272,7 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
           </>
         )}
 
+        {/* Google Sheets Fields */}
         {data.provider === 'google-sheets' && (
           <>
             <div>
@@ -163,7 +300,7 @@ export default function NodeConfigPanel({ node, onClose, onUpdate, onDelete }) {
         <div className="p-3.5 rounded-2xl bg-indigo-50/70 border border-indigo-100 text-xs text-indigo-900 space-y-1">
           <div className="font-semibold flex items-center gap-1.5">
             <Code2 className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Dynamic Interpolation</span>
+            <span>Dynamic Variable Interpolation</span>
           </div>
           <p className="text-[11px] text-indigo-800 leading-snug">
             Reference previous step outputs with: <code className="bg-white/80 px-1 py-0.5 rounded font-mono text-[10px] text-indigo-900 border border-indigo-200">{'{{nodes.<id>.output}}'}</code>

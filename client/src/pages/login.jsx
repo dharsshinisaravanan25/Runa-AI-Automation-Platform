@@ -32,7 +32,7 @@ export default function LoginPage() {
   };
 
   const handleDemoFill = () => {
-    setEmail('operator@agentra.ai');
+    setEmail('operator@runa.ai');
     setPassword('Operator123!');
   };
 
@@ -43,20 +43,20 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <div 
             onClick={() => router.push('/')}
-            className="inline-flex items-center gap-2.5 cursor-pointer group mb-3"
+            className="inline-flex items-center gap-2.5 cursor-pointer group mb-2"
           >
-            <div className="w-11 h-11 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform">
               <Zap className="w-6 h-6 text-white fill-current" />
             </div>
             <div className="text-left">
-              <span className="font-bold text-2xl text-slate-900 tracking-tight block">Agentra</span>
-              <p className="text-xs text-slate-500 font-medium">Autonomous Operations Platform</p>
+              <span className="font-extrabold text-2xl text-slate-900 tracking-tight block">RUNA</span>
+              <p className="text-xs text-slate-500 font-medium italic">You define it. We run it.</p>
             </div>
           </div>
           <h2 className="text-xl font-bold text-slate-900 tracking-tight mt-2">
             Welcome back
           </h2>
-          <p className="text-xs text-slate-500 mt-1">Sign in to your operator account to continue</p>
+          <p className="text-xs text-slate-500 mt-1">Sign in to your RUNA operator console</p>
         </div>
 
         {/* Login Card */}
@@ -65,7 +65,7 @@ export default function LoginPage() {
           <div className="mb-6 p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-100 flex items-center justify-between">
             <div className="flex items-center gap-2 text-xs text-indigo-900 font-semibold">
               <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
-              <span>1-Click Demo Login</span>
+              <span>1-Click Demo Operator</span>
             </div>
             <button
               type="button"
@@ -93,7 +93,7 @@ export default function LoginPage() {
                 <input
                   type="email"
                   required
-                  placeholder="operator@agentra.ai"
+                  placeholder="operator@runa.ai"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
@@ -127,7 +127,7 @@ export default function LoginPage() {
                 <Loader2 className="w-4 h-4 animate-spin text-white" />
               ) : (
                 <>
-                  <span>Sign In as Operator</span>
+                  <span>Sign In to RUNA</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}

@@ -36,21 +36,24 @@ export default function Navbar({ onOpenNotifications }) {
   const getPageTitle = () => {
     const path = router.pathname;
     if (path.startsWith('/dashboard')) return 'Dashboard';
-    if (path.startsWith('/workflows/builder')) return 'AI Workflow Builder';
-    if (path.startsWith('/workflows/')) return 'Workflow Editor';
-    if (path.startsWith('/workflows')) return 'Workflows';
-    if (path.startsWith('/executions/')) return 'Execution Trace';
-    if (path.startsWith('/executions')) return 'Executions';
-    if (path.startsWith('/integrations')) return 'Integrations Vault';
-    if (path.startsWith('/settings')) return 'Settings & Diagnostics';
-    return 'Agentra';
+    if (path.startsWith('/workflows/builder')) return 'AI Workflow Studio';
+    if (path.startsWith('/workflows/')) return 'Workflow Canvas Editor';
+    if (path.startsWith('/workflows')) return 'Workflows Matrix';
+    if (path.startsWith('/executions/')) return 'Execution Trace Inspector';
+    if (path.startsWith('/executions')) return 'Executions Stream';
+    if (path.startsWith('/integrations')) return 'Integrations & Credentials Vault';
+    if (path.startsWith('/settings')) return 'Substrate Diagnostics & Settings';
+    return 'RUNA Console';
   };
 
   return (
     <header className="h-16 bg-white/90 backdrop-blur-md border-b border-slate-200/80 px-6 flex items-center justify-between sticky top-0 z-30 select-none shadow-soft-sm font-sans">
       {/* Breadcrumb & Path */}
       <div className="flex items-center gap-2 text-sm text-slate-500">
-        <span className="font-semibold text-slate-800">Agentra</span>
+        <span className="font-extrabold text-slate-900 tracking-tight flex items-center gap-1.5">
+          <Zap className="w-4 h-4 text-indigo-600 fill-current" />
+          <span>RUNA</span>
+        </span>
         <ChevronRight className="w-4 h-4 text-slate-400" />
         <h1 className="font-semibold text-slate-900">
           {getPageTitle()}
@@ -63,7 +66,7 @@ export default function Navbar({ onOpenNotifications }) {
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-200 text-xs">
           <span className={`w-2 h-2 rounded-full ${socketConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
           <span className="text-xs font-medium text-slate-600">
-            {socketConnected ? 'Live Connected' : 'Syncing...'}
+            {socketConnected ? 'Live Socket Stream' : 'Connecting...'}
           </span>
         </div>
 
@@ -85,14 +88,14 @@ export default function Navbar({ onOpenNotifications }) {
         {/* User Operator Badge */}
         <div className="flex items-center gap-3 pl-3 border-l border-slate-200">
           <div className="text-right hidden sm:block">
-            <div className="text-xs font-bold text-slate-900">{user?.name || 'Operator'}</div>
+            <div className="text-xs font-bold text-slate-900">{user?.name || 'RUNA Operator'}</div>
             <div className="text-[11px] text-slate-500 capitalize">
               {user?.role || 'operator'}
             </div>
           </div>
 
           <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs shadow-soft-sm ring-1 ring-indigo-200">
-            {(user?.name || 'AG').charAt(0).toUpperCase()}
+            {(user?.name || 'R').charAt(0).toUpperCase()}
           </div>
 
           <button

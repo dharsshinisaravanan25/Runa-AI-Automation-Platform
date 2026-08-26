@@ -14,12 +14,27 @@ import {
   CheckCircle2,
   Loader2,
   Cpu,
-  Radio
+  Radio,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
 const PROMPT_RECIPES = [
   {
-    title: 'Gmail Invoice Triage to Sheets & Slack',
+    title: 'Omnichannel Social Media AI Publisher',
+    tag: 'Social Growth',
+    prompt: 'Every morning at 10 AM, generate viral thought leadership for LinkedIn, a reel caption with hashtags for Instagram, and a company update for Facebook using Gemini AI.'
+  },
+  {
+    title: 'WhatsApp & Telegram Urgent Lead Alert',
+    tag: 'Messaging',
+    prompt: 'Listen to incoming customer inquiries on webhook, analyze urgency with AI Agent, and immediately send direct message on WhatsApp and broadcast to Telegram war room.'
+  },
+  {
+    title: 'Gmail Invoice Ingestion to Sheets & Slack',
     tag: 'Finance',
     prompt: 'Ingest unread billing emails from Gmail, parse invoice totals & vendor names with AI extraction agent, record rows in Google Sheets, and notify #finance channel on Slack.'
   },
@@ -27,16 +42,6 @@ const PROMPT_RECIPES = [
     title: 'Customer Sentiment Escalation & Discord',
     tag: 'Support',
     prompt: 'Listen to incoming customer support tickets via Webhook, analyze sentiment score and frustration level using AI Agent, and immediately escalate critical issues to Discord with high priority.'
-  },
-  {
-    title: 'Executive Daily Operations Digest',
-    tag: 'Digest',
-    prompt: 'Every morning at 9 AM, fetch important unread messages from Gmail, generate an executive bullet-point summary with AI agent, and dispatch morning brief to Slack.'
-  },
-  {
-    title: 'Security Incident War Room Alert',
-    tag: 'Incident',
-    prompt: 'Ingest urgent server error alerts, analyze root cause impact across infrastructure with AI Agent, post incident brief to Slack war room, and append timestamped log to Google Sheets.'
   }
 ];
 
@@ -85,7 +90,7 @@ export default function AIWorkflowBuilderPage() {
         triggerConfig: generatedWorkflow.triggerConfig || { type: 'manual' },
         nodes: generatedWorkflow.nodes,
         edges: generatedWorkflow.edges,
-        tags: generatedWorkflow.tags || ['Agentra', 'Synthesized']
+        tags: generatedWorkflow.tags || ['RUNA', 'Synthesized']
       });
 
       const newWf = res.data?.data?.workflow;
@@ -105,15 +110,15 @@ export default function AIWorkflowBuilderPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 mb-1">
+              <div className="flex items-center gap-2 text-xs font-bold text-indigo-600 mb-1">
                 <Sparkles className="w-4 h-4 text-indigo-600" />
-                <span>AI Workflow Synthesizer</span>
+                <span>RUNA AI STUDIO // (You define it. We run it.)</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                AI Workflow Studio
+                AI Workflow Synthesizer Studio
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Compile natural language into an executable multi-agent DAG workflow
+                Compile natural language into real-world automated DAGs across WhatsApp, LinkedIn, Instagram, Telegram, & Sheets
               </p>
             </div>
           </div>
@@ -124,13 +129,13 @@ export default function AIWorkflowBuilderPage() {
               <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-soft-sm space-y-4">
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-700 uppercase tracking-wider">
                   <Terminal className="w-4 h-4 text-indigo-600" />
-                  <span>Prompt Specification</span>
+                  <span>Automation Intent Prompt</span>
                 </div>
 
                 <form onSubmit={handleGenerate} className="space-y-3">
                   <textarea
                     rows={5}
-                    placeholder="Describe your desired automation flow in detail..."
+                    placeholder="e.g. Ingest customer leads from Facebook, summarize with Gemini AI, send WhatsApp message to customer, and notify sales on Telegram"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 leading-relaxed resize-none transition shadow-soft-sm"
@@ -150,12 +155,12 @@ export default function AIWorkflowBuilderPage() {
                     {isGenerating ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin text-white" />
-                        <span>Synthesizing Workflow...</span>
+                        <span>RUNA Swarm Synthesizing...</span>
                       </>
                     ) : (
                       <>
                         <Sparkles className="w-4 h-4" />
-                        <span>Generate Workflow Graph</span>
+                        <span>Synthesize Workflow Graph</span>
                       </>
                     )}
                   </button>
@@ -165,7 +170,7 @@ export default function AIWorkflowBuilderPage() {
               {/* Recipe Suggestions */}
               <div className="p-6 rounded-3xl bg-white border border-slate-200/90 shadow-soft-sm space-y-3">
                 <h3 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                  Inspiration Recipes
+                  Real-Life Automation Recipes
                 </h3>
                 <div className="space-y-2.5">
                   {PROMPT_RECIPES.map((recipe, idx) => (
@@ -202,7 +207,7 @@ export default function AIWorkflowBuilderPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              Generated Successfully
+                              Synthesized by RUNA Swarm
                             </span>
                             <span className="text-xs text-slate-500">
                               {generatedWorkflow.nodes?.length || 0} Nodes • {generatedWorkflow.edges?.length || 0} Edges
@@ -220,7 +225,7 @@ export default function AIWorkflowBuilderPage() {
                       {/* Step-by-Step Preview */}
                       <div className="mt-6 space-y-3">
                         <h4 className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                          Pipeline Steps
+                          Compiled Pipeline Steps
                         </h4>
 
                         <div className="space-y-2.5">
@@ -264,7 +269,7 @@ export default function AIWorkflowBuilderPage() {
                         ) : (
                           <Save className="w-4 h-4" />
                         )}
-                        <span>Open & Edit on Visual Canvas</span>
+                        <span>Open on Visual React Flow Canvas</span>
                         <ArrowRight className="w-4 h-4" />
                       </button>
                     </div>
@@ -275,10 +280,10 @@ export default function AIWorkflowBuilderPage() {
                       <Cpu className="w-8 h-8" />
                     </div>
                     <h3 className="text-base font-bold text-slate-900">
-                      AI Workflow Graph Compiler
+                      RUNA Graph Synthesizer
                     </h3>
                     <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                      Enter a prompt on the left or select an inspiration recipe to compile your visual multi-agent workflow.
+                      "You define it. We run it." Enter a prompt to automatically build an omnichannel multi-agent workflow.
                     </p>
                   </div>
                 )}

@@ -18,7 +18,12 @@ import {
   Tag,
   CheckCircle,
   ExternalLink,
-  Zap
+  Zap,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
 export default function WorkflowsListPage() {
@@ -70,7 +75,7 @@ export default function WorkflowsListPage() {
 
   const handleDelete = async (id, e) => {
     e.stopPropagation();
-    if (!window.confirm('Are you sure you want to delete this workflow and its execution logs?')) return;
+    if (!window.confirm('Are you sure you want to delete this workflow and its logs?')) return;
     try {
       setActionLoading((p) => ({ ...p, [id]: 'deleting' }));
       await api.delete(`/workflows/${id}`);
@@ -100,19 +105,19 @@ export default function WorkflowsListPage() {
   const handleCreateManual = async () => {
     try {
       const res = await api.post('/workflows', {
-        name: 'New Custom Automation Flow',
-        description: 'Configured on visual React Flow canvas',
+        name: 'Omnichannel Social & Messaging Flow',
+        description: 'Automate across WhatsApp, LinkedIn, Telegram & Gemini AI',
         nodes: [
           {
             id: 'node_1',
             type: 'custom',
             position: { x: 120, y: 200 },
             data: {
-              label: 'Inbound Webhook Trigger',
+              label: 'Inbound Webhook Alert',
               category: 'trigger',
               icon: 'Zap',
               provider: 'webhook',
-              action: 'manual_trigger',
+              action: 'receive_webhook',
               config: { endpoint: '/api/v1/trigger' }
             }
           },
@@ -121,23 +126,53 @@ export default function WorkflowsListPage() {
             type: 'custom',
             position: { x: 450, y: 200 },
             data: {
-              label: 'AI Reasoning Swarm Agent',
+              label: 'Gemini AI Copywriter Agent',
               category: 'ai_agent',
               icon: 'Sparkles',
               provider: 'ai',
               action: 'ai_process',
-              config: { prompt: 'Process event and formulate resolution' }
+              config: { prompt: 'Format updates for WhatsApp and LinkedIn' }
+            }
+          },
+          {
+            id: 'node_3',
+            type: 'custom',
+            position: { x: 780, y: 120 },
+            data: {
+              label: 'WhatsApp Direct Notification',
+              category: 'messaging',
+              icon: 'MessageCircle',
+              provider: 'whatsapp',
+              action: 'send_message',
+              config: { to: '+1234567890', message: 'RUNA Alert: {{nodes.node_2.output}}' }
+            }
+          },
+          {
+            id: 'node_4',
+            type: 'custom',
+            position: { x: 780, y: 280 },
+            data: {
+              label: 'LinkedIn Thought Leadership',
+              category: 'social',
+              icon: 'Linkedin',
+              provider: 'linkedin',
+              action: 'create_post',
+              config: { text: '{{nodes.node_2.output}}' }
             }
           }
         ],
-        edges: [{ id: 'e1-2', source: 'node_1', target: 'node_2', animated: true }]
+        edges: [
+          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
+          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
+          { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true }
+        ]
       });
 
       if (res.data?.data?.workflow) {
         router.push(`/workflows/${res.data.data.workflow._id}`);
       }
     } catch (err) {
-      alert('Failed to create workflow: ' + err.message);
+      alert('Failed to create manual workflow: ' + err.message);
     }
   };
 
@@ -149,10 +184,10 @@ export default function WorkflowsListPage() {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                Workflows Catalog
+                Workflows Matrix
               </h2>
               <p className="text-xs text-slate-500 mt-1">
-                Visual DAG graphs orchestrated by cooperating AI agent swarms
+                Visual DAG graphs orchestrated by cooperating AI swarms • <span className="italic">"You define it. We run it."</span>
               </p>
             </div>
 
@@ -170,7 +205,7 @@ export default function WorkflowsListPage() {
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs sm:text-sm border border-slate-200 shadow-soft-sm transition"
               >
                 <Plus className="w-4 h-4 text-slate-500" />
-                <span>New Workflow</span>
+                <span>New Omnichannel Flow</span>
               </button>
             </div>
           </div>
@@ -181,7 +216,7 @@ export default function WorkflowsListPage() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
               <input
                 type="text"
-                placeholder="Search workflows..."
+                placeholder="Search WhatsApp, LinkedIn, Sheets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-10 pr-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition"
@@ -189,7 +224,7 @@ export default function WorkflowsListPage() {
             </form>
 
             <div className="flex items-center gap-1.5 overflow-x-auto w-full sm:w-auto">
-              {['', 'AI Agent', 'Gmail', 'Slack', 'Sheets', 'Finance', 'Support'].map((tag) => (
+              {['', 'WhatsApp', 'Telegram', 'LinkedIn', 'Instagram', 'Sheets', 'Gmail', 'Slack'].map((tag) => (
                 <button
                   key={tag || 'all'}
                   onClick={() => setSelectedTag(tag)}
@@ -216,7 +251,7 @@ export default function WorkflowsListPage() {
               <GitBranch className="w-12 h-12 text-slate-300 mx-auto mb-3" />
               <h3 className="text-sm font-bold text-slate-900">No workflows found</h3>
               <p className="text-xs text-slate-500 mt-1">
-                Create or generate a workflow to get started.
+                Synthesize a workflow from the AI Studio.
               </p>
             </div>
           ) : (
@@ -250,7 +285,7 @@ export default function WorkflowsListPage() {
                       </h3>
 
                       <p className="text-xs text-slate-500 mt-2 line-clamp-2 leading-relaxed">
-                        {wf.description || 'Custom multi-agent DAG pipeline configured in Agentra.'}
+                        {wf.description || 'Custom multi-agent DAG pipeline configured in RUNA.'}
                       </p>
 
                       {/* Tags */}

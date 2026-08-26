@@ -9,7 +9,8 @@ import {
   Settings,
   Radio,
   Zap,
-  ChevronRight
+  ChevronRight,
+  Shield
 } from 'lucide-react';
 
 export default function Sidebar() {
@@ -18,7 +19,7 @@ export default function Sidebar() {
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Workflows', href: '/workflows', icon: GitBranch },
-    { name: 'AI Builder', href: '/workflows/builder', icon: Sparkles, badge: 'New' },
+    { name: 'AI Studio', href: '/workflows/builder', icon: Sparkles, badge: 'Live' },
     { name: 'Executions', href: '/executions', icon: PlayCircle },
     { name: 'Integrations', href: '/integrations', icon: Puzzle },
     { name: 'Settings', href: '/settings', icon: Settings },
@@ -34,23 +35,25 @@ export default function Sidebar() {
   return (
     <aside className="w-64 bg-white border-r border-slate-200/80 flex flex-col shrink-0 select-none z-30 shadow-soft-sm font-sans">
       {/* Brand Header */}
-      <div className="h-16 flex items-center px-6 border-b border-slate-100 bg-white">
+      <div className="h-18 flex items-center px-6 border-b border-slate-100 bg-white py-3">
         <div 
           onClick={() => router.push('/dashboard')}
           className="flex items-center gap-3 cursor-pointer group"
         >
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform duration-200">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-100 group-hover:scale-105 transition-transform duration-200">
             <Zap className="w-5 h-5 text-white fill-current" />
           </div>
 
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base text-slate-900 tracking-tight">Agentra</span>
-              <span className="text-[10px] font-semibold tracking-wide px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                v2.6
+              <span className="font-extrabold text-lg text-slate-900 tracking-tight">RUNA</span>
+              <span className="text-[9px] font-bold tracking-wide px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
+                v3.0
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Autonomous Operations</p>
+            <p className="text-[10px] text-slate-400 font-medium truncate">
+              You define it. We run it.
+            </p>
           </div>
         </div>
       </div>
@@ -97,22 +100,21 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Swarm Engine Status Widget */}
+      {/* Tagline & Swarm Engine Status Widget */}
       <div className="p-4 border-t border-slate-100 bg-slate-50/50">
-        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft-sm">
-          <div className="flex items-center justify-between mb-2">
+        <div className="p-3.5 rounded-2xl bg-white border border-slate-200/80 shadow-soft-sm space-y-2">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-xs font-semibold text-slate-800">Swarm Engine</span>
+              <span className="text-xs font-semibold text-slate-800">Swarm Active</span>
             </div>
             <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-100">
-              Online
+              5 Agents
             </span>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-500">
-            <span>5 Cooperating Agents</span>
-            <span className="text-slate-700 font-medium">Ready</span>
+          <div className="text-[10px] text-slate-500 italic font-medium leading-tight">
+            "You define it. We run it."
           </div>
         </div>
       </div>

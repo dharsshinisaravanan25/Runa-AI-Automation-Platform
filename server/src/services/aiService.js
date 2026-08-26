@@ -279,7 +279,162 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
       };
     }
 
-    // 3. Email Digest & Slack Summary Template
+    // 3. Social Media Omnichannel Growth Template (LinkedIn, Instagram, Facebook)
+    if (p.includes('linkedin') || p.includes('instagram') || p.includes('facebook') || p.includes('social') || p.includes('post')) {
+      return {
+        name: 'Omnichannel Social Media AI Publisher (LinkedIn, IG, FB)',
+        description: 'Compiles thought leadership & marketing content with Gemini AI, formats tailored captions, and automatically publishes across LinkedIn, Instagram, and Facebook.',
+        tags: ['LinkedIn', 'Instagram', 'Facebook', 'AI Marketing'],
+        triggerConfig: { type: 'schedule', schedule: '0 10 * * 1-5' },
+        nodes: [
+          {
+            id: 'node_1',
+            type: 'custom',
+            position: { x: 80, y: 220 },
+            data: {
+              label: 'Daily Social Cron Trigger',
+              category: 'trigger',
+              icon: 'Clock',
+              provider: 'schedule',
+              action: 'cron_trigger',
+              config: { cron: '0 10 * * 1-5' }
+            }
+          },
+          {
+            id: 'node_2',
+            type: 'custom',
+            position: { x: 380, y: 220 },
+            data: {
+              label: 'Gemini Viral Copywriter Agent',
+              category: 'ai_agent',
+              icon: 'Sparkles',
+              provider: 'ai',
+              action: 'ai_process',
+              config: {
+                prompt: 'Draft an engaging thought leadership post about AI operations for LinkedIn, a captivating carousel caption for Instagram, and a concise update for Facebook.',
+                model: 'auto'
+              }
+            }
+          },
+          {
+            id: 'node_3',
+            type: 'custom',
+            position: { x: 720, y: 120 },
+            data: {
+              label: 'LinkedIn Post Publisher',
+              category: 'integration',
+              icon: 'Linkedin',
+              provider: 'linkedin',
+              action: 'create_post',
+              config: { text: '{{nodes.node_2.output.content}}', author: 'Executive Profile' }
+            }
+          },
+          {
+            id: 'node_4',
+            type: 'custom',
+            position: { x: 720, y: 240 },
+            data: {
+              label: 'Instagram Media Dispatch',
+              category: 'integration',
+              icon: 'Instagram',
+              provider: 'instagram',
+              action: 'post_media',
+              config: { caption: '{{nodes.node_2.output.content}} #AI #Automation #RUNA', mediaUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe' }
+            }
+          },
+          {
+            id: 'node_5',
+            type: 'custom',
+            position: { x: 720, y: 360 },
+            data: {
+              label: 'Facebook Page Broadcast',
+              category: 'integration',
+              icon: 'Facebook',
+              provider: 'facebook',
+              action: 'publish_post',
+              config: { message: '{{nodes.node_2.output.content}}' }
+            }
+          }
+        ],
+        edges: [
+          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
+          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
+          { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true },
+          { id: 'e2-5', source: 'node_2', target: 'node_5', animated: true }
+        ]
+      };
+    }
+
+    // 4. Instant Messaging & Alert Escalation (WhatsApp & Telegram)
+    if (p.includes('whatsapp') || p.includes('telegram') || p.includes('chat') || p.includes('message')) {
+      return {
+        name: 'Urgent WhatsApp & Telegram Incident Dispatcher',
+        description: 'Ingests high-priority webhook events, extracts risk level with AI Agent, and delivers real-time notifications via WhatsApp Business API and Telegram War Room.',
+        tags: ['WhatsApp', 'Telegram', 'Real-Time Alerts'],
+        triggerConfig: { type: 'webhook', webhookPath: '/webhook/urgent-alert' },
+        nodes: [
+          {
+            id: 'node_1',
+            type: 'custom',
+            position: { x: 100, y: 220 },
+            data: {
+              label: 'Inbound Webhook Alert',
+              category: 'trigger',
+              icon: 'Zap',
+              provider: 'webhook',
+              action: 'receive_webhook',
+              config: { endpoint: '/api/v1/inbound-events' }
+            }
+          },
+          {
+            id: 'node_2',
+            type: 'custom',
+            position: { x: 420, y: 220 },
+            data: {
+              label: 'AI Alert Formatter Agent',
+              category: 'ai_agent',
+              icon: 'Sparkles',
+              provider: 'ai',
+              action: 'ai_process',
+              config: { prompt: 'Format urgent alert summary for instant messenger delivery' }
+            }
+          },
+          {
+            id: 'node_3',
+            type: 'custom',
+            position: { x: 740, y: 140 },
+            data: {
+              label: 'WhatsApp Direct Message',
+              category: 'integration',
+              icon: 'MessageCircle',
+              provider: 'whatsapp',
+              action: 'send_message',
+              config: { to: '+1 (555) 019-2834', message: '🚨 *RUNA ALERT*: {{nodes.node_2.output.content}}' }
+            }
+          },
+          {
+            id: 'node_4',
+            type: 'custom',
+            position: { x: 740, y: 320 },
+            data: {
+              label: 'Telegram War Room Broadcast',
+              category: 'integration',
+              icon: 'Send',
+              provider: 'telegram',
+              action: 'send_alert',
+              config: { chatId: '@runa_incident_war_room', message: '⚡ *Incident Logged*: {{nodes.node_2.output.content}}' }
+            }
+          }
+        ],
+        edges: [
+          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
+          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
+          { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true }
+        ]
+      };
+    }
+
+    // 5. Email Digest & Slack Summary Template
     if (p.includes('email') || p.includes('gmail') || p.includes('digest') || p.includes('summary')) {
       return {
         name: 'Executive Inbox AI Digest & Slack Dispatch',

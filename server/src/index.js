@@ -64,8 +64,8 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'online',
     timestamp: new Date().toISOString(),
-    service: 'Agentra // Autonomous Operations Fabric Engine',
-    version: '2.6.0',
+    service: 'RUNA // Autonomous Operations Engine (You define it. We run it.)',
+    version: '3.0.0',
     langGraph: require('./agents/orchestrator').getLangGraphStatus(),
     inMemoryDB: require('./config/db').isInMemory(),
     redisActive: require('./queues/executionQueue').isRedisActive()
@@ -88,11 +88,23 @@ const seedDefaultData = async () => {
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash('Operator123!', salt);
 
-    // 1. Seed operator@agentra.ai
+    // 1. Seed operator@runa.ai
+    let runaOp = await db.User.findOne({ email: 'operator@runa.ai' });
+    if (!runaOp) {
+      runaOp = await db.User.create({
+        name: 'Alex Rivera (RUNA Operator)',
+        email: 'operator@runa.ai',
+        password: hashedPassword,
+        role: 'operator',
+        lastLogin: new Date()
+      });
+    }
+
+    // 2. Seed backward-compatible operator accounts
     let agentraOp = await db.User.findOne({ email: 'operator@agentra.ai' });
     if (!agentraOp) {
       agentraOp = await db.User.create({
-        name: 'Alex Rivera (Agentra Operator)',
+        name: 'Alex Rivera (Demo Operator)',
         email: 'operator@agentra.ai',
         password: hashedPassword,
         role: 'operator',
@@ -100,20 +112,8 @@ const seedDefaultData = async () => {
       });
     }
 
-    // 2. Seed operator@nexura.ai and operator@agentflow.ai (for backward compatibility)
-    let altOp = await db.User.findOne({ email: 'operator@agentflow.ai' });
-    if (!altOp) {
-      altOp = await db.User.create({
-        name: 'Alex Rivera (Demo Operator)',
-        email: 'operator@agentflow.ai',
-        password: hashedPassword,
-        role: 'operator',
-        lastLogin: new Date()
-      });
-    }
-
-    const operatorId = agentraOp._id || altOp._id;
-    console.log('\x1b[32m%s\x1b[0m', ' ⚡ Agentra Demo Operator initialized: operator@agentra.ai / Operator123!');
+    const operatorId = runaOp._id || agentraOp._id;
+    console.log('\x1b[32m%s\x1b[0m', ' ⚡ RUNA Demo Operator initialized: operator@runa.ai / Operator123!');
 
     // Seed sample workflow if none exist
     const count = await db.Workflow.countDocuments({ owner: operatorId });

@@ -21,7 +21,12 @@ import {
   Terminal,
   Zap,
   Radio,
-  Layers
+  Layers,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -117,15 +122,15 @@ export default function DashboardPage() {
           {/* Quick AI Workflow Prompt Synthesizer Box */}
           <div className="rounded-3xl bg-white border border-slate-200/90 p-6 sm:p-8 shadow-soft-sm relative overflow-hidden">
             <div className="relative z-10 max-w-3xl space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-semibold">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold">
                 <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
-                <span>AI Workflow Synthesizer</span>
+                <span>RUNA AI Synthesizer • (You define it. We run it.)</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-                What automation would you like to build?
+                What would you like RUNA to run today?
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                Describe desired triggers, multi-step actions, and logic in plain natural language. The Agentra 5-agent swarm will compile and validate the graph.
+                Connect **WhatsApp, Telegram, LinkedIn, Instagram, Facebook, or Sheets** in seconds. Describe what to trigger, how AI should reason, and where to post or dispatch.
               </p>
 
               {/* Prompt Input Form */}
@@ -134,7 +139,7 @@ export default function DashboardPage() {
                   <Terminal className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
                   <input
                     type="text"
-                    placeholder="e.g. Ingest customer emails from Gmail, parse urgency with AI, and post alerts to Slack & Google Sheets"
+                    placeholder="e.g. Generate weekly LinkedIn & Instagram posts using Gemini AI and alert on Telegram"
                     value={promptInput}
                     onChange={(e) => setPromptInput(e.target.value)}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-11 pr-4 py-3 text-xs sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition shadow-soft-sm"
@@ -145,7 +150,7 @@ export default function DashboardPage() {
                   className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm shadow-md shadow-indigo-100 transition hover:scale-105 active:scale-95 shrink-0"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>Generate Flow</span>
+                  <span>Synthesize</span>
                 </button>
               </form>
             </div>
@@ -173,7 +178,7 @@ export default function DashboardPage() {
                   onClick={() => router.push('/workflows')}
                   className="text-xs text-indigo-600 hover:text-indigo-700 font-semibold flex items-center gap-1"
                 >
-                  View all
+                  View catalog
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -238,8 +243,8 @@ export default function DashboardPage() {
                     <Activity className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-sm text-slate-900">Recent Executions</h3>
-                    <p className="text-xs text-slate-400">Live multi-agent telemetry</p>
+                    <h3 className="font-bold text-sm text-slate-900">Live Swarm Executions</h3>
+                    <p className="text-xs text-slate-400">Real-time socket execution traces</p>
                   </div>
                 </div>
 

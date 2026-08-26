@@ -14,7 +14,13 @@ import {
   CheckCircle2,
   AlertCircle,
   Activity,
-  ChevronRight
+  ChevronRight,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Share2
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -27,7 +33,13 @@ const ICON_MAP = {
   Filter,
   Zap,
   Globe,
-  Clock
+  Clock,
+  MessageCircle,
+  Send,
+  Linkedin,
+  Instagram,
+  Facebook,
+  Share2
 };
 
 const CATEGORY_COLORS = {
@@ -40,6 +52,16 @@ const CATEGORY_COLORS = {
     badge: 'bg-indigo-50 text-indigo-700 border-indigo-200',
     border: 'border-l-4 border-l-indigo-500',
     iconBg: 'bg-indigo-50 text-indigo-600'
+  },
+  social: {
+    badge: 'bg-sky-50 text-sky-700 border-sky-200',
+    border: 'border-l-4 border-l-sky-500',
+    iconBg: 'bg-sky-50 text-sky-600'
+  },
+  messaging: {
+    badge: 'bg-teal-50 text-teal-700 border-teal-200',
+    border: 'border-l-4 border-l-teal-500',
+    iconBg: 'bg-teal-50 text-teal-600'
   },
   integration: {
     badge: 'bg-purple-50 text-purple-700 border-purple-200',
@@ -55,7 +77,7 @@ const CATEGORY_COLORS = {
 
 const CustomNode = ({ data, selected }) => {
   const Icon = ICON_MAP[data?.icon] || Zap;
-  const categoryStyle = CATEGORY_COLORS[data?.category] || CATEGORY_COLORS.trigger;
+  const categoryStyle = CATEGORY_COLORS[data?.category] || CATEGORY_COLORS.integration;
 
   const status = data?.executionStatus; // 'IDLE', 'RUNNING', 'COMPLETED', 'FAILED'
 
@@ -126,7 +148,7 @@ const CustomNode = ({ data, selected }) => {
         {/* Config Summary */}
         {data?.config && Object.keys(data.config).length > 0 && (
           <div className="pt-1.5 border-t border-slate-100 text-[11px] text-slate-500 truncate">
-            {data.config.channel || data.config.query || data.config.endpoint || data.config.prompt || 'Configured'}
+            {data.config.to || data.config.chatId || data.config.caption || data.config.channel || data.config.query || data.config.endpoint || data.config.prompt || 'Configured'}
           </div>
         )}
       </div>
