@@ -1,6 +1,13 @@
 const axios = require('axios');
 const env = require('../config/env');
 
+const GEMINI_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-flash-latest'
+];
+
 class AIService {
   async generateWorkflowFromPrompt(prompt, userId) {
     if (!prompt || typeof prompt !== 'string' || prompt.trim().length === 0) {
@@ -9,19 +16,7 @@ class AIService {
 
     const cleanPrompt = prompt.trim();
 
-    // 1. Try OpenRouter if API Key exists
-    if (env.OPENROUTER_API_KEY) {
-      try {
-        const generated = await this.generateWithOpenRouter(cleanPrompt);
-        if (generated && generated.nodes && generated.nodes.length > 0) {
-          return generated;
-        }
-      } catch (err) {
-        console.warn('OpenRouter workflow generation failed, falling back to Gemini:', err.message);
-      }
-    }
-
-    // 2. Try Gemini if API Key exists
+    // 1. Try Gemini if API Key exists
     if (env.GEMINI_API_KEY) {
       try {
         const generated = await this.generateWithGemini(cleanPrompt);
@@ -33,30 +28,55 @@ class AIService {
       }
     }
 
-    // 3. Fallback: Deterministic Rule-Based Workflow Builder
+    // 2. Try OpenRouter if API Key exists
+    if (env.OPENROUTER_API_KEY) {
+      try {
+        const generated = await this.generateWithOpenRouter(cleanPrompt);
+        if (generated && generated.nodes && generated.nodes.length > 0) {
+          return generated;
+        }
+      } catch (err) {
+        console.warn('OpenRouter workflow generation failed, falling back to Deterministic Rule Engine:', err.message);
+      }
+    }
+
+    // 3. Fallback: Smart Dynamic Rule-Based Workflow Builder
     return this.buildDeterministicWorkflow(cleanPrompt);
   }
 
-  async generateWithOpenRouter(prompt) {
-    const systemPrompt = `You are an expert Workflow Architect for an AI Operations Automation Platform.
-Given an automation description in natural language, output ONLY a valid JSON object representing an executable workflow graph with nodes, coordinates, and edges.
-Format:
+  async generateWithGemini(prompt) {
+    const systemPrompt = `You are an expert Workflow Architect for the RUNA AI Operations Platform.
+Convert the user's natural language automation request into an executable workflow DAG graph.
+Supported providers:
+- webhook (action: receive_webhook, config: { endpoint: string })
+- ai (action: ai_process | summarize | sentiment_analysis, config: { prompt: string, model: 'auto' })
+- whatsapp (action: send_message | send_template, config: { to: string, message: string })
+- telegram (action: send_alert | broadcast_group, config: { chatId: string, message: string })
+- linkedin (action: create_post | send_inmail, config: { text: string, author: string })
+- instagram (action: post_media | reply_dm, config: { caption: string, mediaUrl: string })
+- facebook (action: publish_post | process_lead, config: { message: string, pageId: string })
+- google-sheets (action: append_row | read_range, config: { spreadsheetId: string, range: string, values: string })
+- gmail (action: read_inbox | send_email, config: { query: string, to: string, subject: string, body: string })
+- slack (action: post_message, config: { channel: string, message: string })
+- discord (action: post_message, config: { channelId: string, message: string })
+
+Output must strictly be a valid JSON object matching:
 {
-  "name": "Descriptive Workflow Title",
-  "description": "Clear explanation of the automation pipeline",
-  "tags": ["AI", "Integrations", "Ops"],
-  "triggerConfig": { "type": "manual" | "schedule" | "webhook" | "gmail_trigger", "schedule": "" },
+  "name": "Descriptive Workflow Name",
+  "description": "Clear explanation of what the workflow accomplishes",
+  "tags": ["Tag1", "Tag2"],
+  "triggerConfig": { "type": "webhook" | "schedule" | "gmail_trigger" | "manual" },
   "nodes": [
     {
       "id": "node_1",
       "type": "custom",
-      "position": { "x": 100, "y": 200 },
+      "position": { "x": 100, "y": 220 },
       "data": {
-        "label": "Step Title",
-        "category": "trigger" | "ai_agent" | "integration" | "logic",
-        "icon": "Mail" | "MessageSquare" | "Bot" | "Table" | "Sparkles" | "Cpu" | "Filter",
-        "provider": "gmail" | "slack" | "discord" | "google-sheets" | "ai",
-        "action": "send_email" | "read_inbox" | "post_message" | "append_row" | "ai_process" | "summarize" | "filter",
+        "label": "Human Readable Step Title",
+        "category": "trigger" | "ai_agent" | "messaging" | "social" | "integration" | "logic",
+        "icon": "Zap" | "Sparkles" | "MessageCircle" | "Send" | "Linkedin" | "Instagram" | "Facebook" | "Table" | "Mail" | "MessageSquare",
+        "provider": "webhook" | "ai" | "whatsapp" | "telegram" | "linkedin" | "instagram" | "facebook" | "google-sheets" | "gmail" | "slack" | "discord",
+        "action": "receive_webhook" | "ai_process" | "send_message" | "send_alert" | "create_post" | "post_media" | "publish_post" | "append_row" | "send_email" | "post_message",
         "config": { ... }
       }
     }
@@ -65,7 +85,55 @@ Format:
     { "id": "e1-2", "source": "node_1", "target": "node_2", "animated": true }
   ]
 }
-Return ONLY valid raw JSON, with no markdown code blocks.`;
+
+Distribute node positions horizontally along the x-axis (e.g. x: 100, x: 420, x: 740, etc.) with y: 220. If multiple branches exist, offset y by +120 or -120.`;
+
+    for (const model of GEMINI_MODELS) {
+      try {
+        const response = await axios.post(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${env.GEMINI_API_KEY}`,
+          {
+            contents: [{ parts: [{ text: `${systemPrompt}\n\nUser Request: ${prompt}` }] }],
+            generationConfig: {
+              response_mime_type: 'application/json',
+              temperature: 0.1
+            }
+          },
+          { timeout: 25000 }
+        );
+
+        let text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+        const parsed = JSON.parse(text);
+
+        // Sanitize nodes structure for React Flow
+        if (parsed && Array.isArray(parsed.nodes)) {
+          parsed.nodes = parsed.nodes.map((node, i) => ({
+            id: node.id || `node_${i + 1}`,
+            type: 'custom',
+            position: node.position || { x: 100 + i * 320, y: 220 },
+            data: {
+              label: node.data?.label || node.label || `Step ${i + 1}`,
+              category: node.data?.category || node.category || 'integration',
+              icon: node.data?.icon || (node.data?.provider === 'whatsapp' ? 'MessageCircle' : 'Zap'),
+              provider: node.data?.provider || node.provider || 'core',
+              action: node.data?.action || node.action || 'execute',
+              config: node.data?.config || node.config || {}
+            }
+          }));
+          return parsed;
+        }
+      } catch (err) {
+        console.warn(`Gemini model ${model} failed:`, err.response?.data?.error?.message || err.message);
+      }
+    }
+
+    throw new Error('All Gemini models failed or timed out');
+  }
+
+  async generateWithOpenRouter(prompt) {
+    const systemPrompt = `You are an expert Workflow Architect for the RUNA AI Operations Platform.
+Output ONLY a valid JSON object representing an executable workflow DAG graph. Format: { name, description, tags, triggerConfig, nodes, edges }. Nodes must have id, type: 'custom', position: {x,y}, data: { label, category, icon, provider, action, config }. Return raw JSON only.`;
 
     const response = await axios.post(
       'https://openrouter.ai/api/v1/chat/completions',
@@ -80,10 +148,10 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
       {
         headers: {
           Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
-          'HTTP-Referer': 'https://agentflow.ai',
-          'X-Title': 'Agentflow AI'
+          'HTTP-Referer': 'https://runa.ai',
+          'X-Title': 'RUNA AI'
         },
-        timeout: 4000
+        timeout: 15000
       }
     );
 
@@ -92,194 +160,128 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
     return JSON.parse(text);
   }
 
-  async generateWithGemini(prompt) {
-    const systemPrompt = `You are a Workflow Architect. Return ONLY JSON matching { name, description, tags, triggerConfig, nodes, edges }. Nodes must have id, type: 'custom', position: { x, y }, data: { label, category, icon, provider, action, config }. Return raw JSON only.`;
-
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${env.GEMINI_API_KEY}`,
-      {
-        contents: [
-          {
-            parts: [
-              { text: `${systemPrompt}\n\nUser Request: ${prompt}` }
-            ]
-          }
-        ]
-      },
-      { timeout: 8000 }
-    );
-
-    let text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(text);
-  }
-
   buildDeterministicWorkflow(prompt) {
     const p = prompt.toLowerCase();
 
-    // 1. Invoice & Payment Processing Template
-    if (p.includes('invoice') || p.includes('stripe') || p.includes('payment') || p.includes('bill')) {
-      return {
-        name: 'Automated Invoice Triage & Sheet Recording',
-        description: 'Monitors incoming billing emails, extracts invoice details via AI Agent, logs record into Google Sheets, and notifies Slack channel.',
-        tags: ['Finance', 'AI Agent', 'Sheets', 'Slack'],
-        triggerConfig: { type: 'gmail_trigger', filter: 'has:attachment invoice' },
-        nodes: [
-          {
-            id: 'node_1',
-            type: 'custom',
-            position: { x: 100, y: 220 },
-            data: {
-              label: 'Gmail Invoice Ingestion',
-              category: 'trigger',
-              icon: 'Mail',
-              provider: 'gmail',
-              action: 'read_inbox',
-              config: {
-                query: 'subject:Invoice OR subject:Bill',
-                maxResults: 5
-              }
-            }
-          },
-          {
-            id: 'node_2',
-            type: 'custom',
-            position: { x: 420, y: 220 },
-            data: {
-              label: 'AI Data Extraction Agent',
-              category: 'ai_agent',
-              icon: 'Sparkles',
-              provider: 'ai',
-              action: 'ai_process',
-              config: {
-                prompt: 'Extract vendor name, invoice number, due date, total amount, and line items as structured JSON from this email.',
-                model: 'auto'
-              }
-            }
-          },
-          {
-            id: 'node_3',
-            type: 'custom',
-            position: { x: 740, y: 140 },
-            data: {
-              label: 'Google Sheets Audit Ledger',
-              category: 'integration',
-              icon: 'Table',
-              provider: 'google-sheets',
-              action: 'append_row',
-              config: {
-                spreadsheetId: '1Financial_Operations_Ledger_2026',
-                range: 'Invoices!A:F',
-                values: '{{nodes.node_2.output.extractedEntities}}'
-              }
-            }
-          },
-          {
-            id: 'node_4',
-            type: 'custom',
-            position: { x: 740, y: 320 },
-            data: {
-              label: 'Slack Finance Dispatch',
-              category: 'integration',
-              icon: 'MessageSquare',
-              provider: 'slack',
-              action: 'post_message',
-              config: {
-                channel: '#finance-ops',
-                message: '⚡ New Invoice parsed by AI Agent! Total amount: {{nodes.node_2.output.amount}} from {{nodes.node_2.output.vendor}}.'
-              }
+    // Extract potential phone number
+    const phoneMatch = prompt.match(/(\+?\d[\d\s\-]{8,15}\d)/);
+    const targetPhone = phoneMatch ? phoneMatch[0].replace(/\s+/g, '') : '+1234567890';
+
+    // 1. WhatsApp & Telegram Specific Pipelines
+    if (p.includes('whatsapp') || p.includes('telegram')) {
+      const isSheets = p.includes('sheet') || p.includes('excel') || p.includes('table') || p.includes('log');
+      const isWhatsApp = p.includes('whatsapp');
+      const isTelegram = p.includes('telegram');
+
+      const nodes = [
+        {
+          id: 'node_1',
+          type: 'custom',
+          position: { x: 100, y: 220 },
+          data: {
+            label: 'Inbound Webhook Lead',
+            category: 'trigger',
+            icon: 'Zap',
+            provider: 'webhook',
+            action: 'receive_webhook',
+            config: { endpoint: '/api/v1/lead-ingestion' }
+          }
+        },
+        {
+          id: 'node_2',
+          type: 'custom',
+          position: { x: 420, y: 220 },
+          data: {
+            label: 'Gemini Urgency & Lead Analysis Agent',
+            category: 'ai_agent',
+            icon: 'Sparkles',
+            provider: 'ai',
+            action: 'ai_process',
+            config: {
+              prompt: `Analyze the incoming lead payload for urgency, sentiment, and action items: ${prompt}`,
+              model: 'auto'
             }
           }
-        ],
-        edges: [
-          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
-          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
-          { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true }
-        ]
+        }
+      ];
+
+      const edges = [
+        { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true }
+      ];
+
+      if (isWhatsApp) {
+        nodes.push({
+          id: 'node_3',
+          type: 'custom',
+          position: { x: 740, y: isSheets ? 140 : 220 },
+          data: {
+            label: 'WhatsApp Direct Alert',
+            category: 'messaging',
+            icon: 'MessageCircle',
+            provider: 'whatsapp',
+            action: 'send_message',
+            config: {
+              to: targetPhone,
+              message: '🚨 *RUNA Lead Alert*: High priority lead processed by Gemini AI. {{nodes.node_2.output.content}}'
+            }
+          }
+        });
+        edges.push({ id: 'e2-3', source: 'node_2', target: 'node_3', animated: true });
+      }
+
+      if (isTelegram && !isWhatsApp) {
+        nodes.push({
+          id: 'node_3',
+          type: 'custom',
+          position: { x: 740, y: isSheets ? 140 : 220 },
+          data: {
+            label: 'Telegram War Room Broadcast',
+            category: 'messaging',
+            icon: 'Send',
+            provider: 'telegram',
+            action: 'send_alert',
+            config: {
+              chatId: '@runa_ops_channel',
+              message: '🚨 *RUNA Lead Alert*: {{nodes.node_2.output.content}}'
+            }
+          }
+        });
+        edges.push({ id: 'e2-3', source: 'node_2', target: 'node_3', animated: true });
+      }
+
+      if (isSheets) {
+        const sheetNodeId = nodes.length + 1;
+        nodes.push({
+          id: `node_${sheetNodeId}`,
+          type: 'custom',
+          position: { x: 740, y: 320 },
+          data: {
+            label: 'Google Sheets Audit Record',
+            category: 'integration',
+            icon: 'Table',
+            provider: 'google-sheets',
+            action: 'append_row',
+            config: {
+              spreadsheetId: '1Customer_Leads_2026',
+              range: 'Leads!A:E',
+              values: '{{nodes.node_1.output.name}}, {{nodes.node_2.output.urgencyScore}}, {{nodes.node_2.output.content}}'
+            }
+          }
+        });
+        edges.push({ id: `e2-${sheetNodeId}`, source: 'node_2', target: `node_${sheetNodeId}`, animated: true });
+      }
+
+      return {
+        name: 'Urgent Lead Ingestion & WhatsApp Dispatch',
+        description: `Automated lead triage pipeline: ingests webhook, evaluates priority with Gemini AI, alerts via WhatsApp to ${targetPhone}${isSheets ? ', and records to Google Sheets' : ''}.`,
+        tags: ['WhatsApp', 'Gemini AI', isSheets ? 'Google Sheets' : 'Alerts'],
+        triggerConfig: { type: 'webhook', webhookPath: '/webhook/lead' },
+        nodes,
+        edges
       };
     }
 
-    // 2. Customer Support & Sentiment Escalation Template
-    if (p.includes('support') || p.includes('customer') || p.includes('ticket') || p.includes('sentiment')) {
-      return {
-        name: 'AI Customer Sentiment & Priority Router',
-        description: 'Analyzes customer inquiries, detects urgent sentiment, logs tickets into Google Sheets, and escalates VIP issues to Discord & Slack.',
-        tags: ['Support', 'AI Agent', 'Sentiment', 'Discord'],
-        triggerConfig: { type: 'webhook', webhookPath: '/webhook/customer-tickets' },
-        nodes: [
-          {
-            id: 'node_1',
-            type: 'custom',
-            position: { x: 100, y: 220 },
-            data: {
-              label: 'Webhook Ticket Ingestion',
-              category: 'trigger',
-              icon: 'Zap',
-              provider: 'webhook',
-              action: 'receive_webhook',
-              config: { endpoint: '/api/v1/inbound-tickets' }
-            }
-          },
-          {
-            id: 'node_2',
-            type: 'custom',
-            position: { x: 400, y: 220 },
-            data: {
-              label: 'AI Sentiment & Severity Agent',
-              category: 'ai_agent',
-              icon: 'Cpu',
-              provider: 'ai',
-              action: 'sentiment_analysis',
-              config: {
-                prompt: 'Assess urgency, customer satisfaction sentiment (0.0 to 1.0), and classify root cause category.',
-                model: 'auto'
-              }
-            }
-          },
-          {
-            id: 'node_3',
-            type: 'custom',
-            position: { x: 720, y: 140 },
-            data: {
-              label: 'Discord VIP Urgent Broadcast',
-              category: 'integration',
-              icon: 'Bot',
-              provider: 'discord',
-              action: 'post_message',
-              config: {
-                channelId: 'ops-alerts-101',
-                title: '🚨 High Priority Customer Escalation',
-                message: 'Sentiment: {{nodes.node_2.output.sentiment}} | Urgent attention needed for ticket.'
-              }
-            }
-          },
-          {
-            id: 'node_4',
-            type: 'custom',
-            position: { x: 720, y: 320 },
-            data: {
-              label: 'Support Operations Sheet',
-              category: 'integration',
-              icon: 'Table',
-              provider: 'google-sheets',
-              action: 'append_row',
-              config: {
-                spreadsheetId: '1Customer_Support_Metrics',
-                range: 'Tickets!A:E',
-                values: '{{nodes.node_1.output.id}}, {{nodes.node_2.output.sentiment}}, {{nodes.node_2.output.confidenceScore}}'
-              }
-            }
-          }
-        ],
-        edges: [
-          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
-          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
-          { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true }
-        ]
-      };
-    }
-
-    // 3. Social Media Omnichannel Growth Template (LinkedIn, Instagram, Facebook)
+    // 2. Social Media Omnichannel Growth (LinkedIn, Instagram, Facebook)
     if (p.includes('linkedin') || p.includes('instagram') || p.includes('facebook') || p.includes('social') || p.includes('post')) {
       return {
         name: 'Omnichannel Social Media AI Publisher (LinkedIn, IG, FB)',
@@ -322,7 +324,7 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             position: { x: 720, y: 120 },
             data: {
               label: 'LinkedIn Post Publisher',
-              category: 'integration',
+              category: 'social',
               icon: 'Linkedin',
               provider: 'linkedin',
               action: 'create_post',
@@ -335,7 +337,7 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             position: { x: 720, y: 240 },
             data: {
               label: 'Instagram Media Dispatch',
-              category: 'integration',
+              category: 'social',
               icon: 'Instagram',
               provider: 'instagram',
               action: 'post_media',
@@ -348,7 +350,7 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             position: { x: 720, y: 360 },
             data: {
               label: 'Facebook Page Broadcast',
-              category: 'integration',
+              category: 'social',
               icon: 'Facebook',
               provider: 'facebook',
               action: 'publish_post',
@@ -365,25 +367,25 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
       };
     }
 
-    // 4. Instant Messaging & Alert Escalation (WhatsApp & Telegram)
-    if (p.includes('whatsapp') || p.includes('telegram') || p.includes('chat') || p.includes('message')) {
+    // 3. Invoice & Payment Processing
+    if (p.includes('invoice') || p.includes('stripe') || p.includes('payment') || p.includes('bill')) {
       return {
-        name: 'Urgent WhatsApp & Telegram Incident Dispatcher',
-        description: 'Ingests high-priority webhook events, extracts risk level with AI Agent, and delivers real-time notifications via WhatsApp Business API and Telegram War Room.',
-        tags: ['WhatsApp', 'Telegram', 'Real-Time Alerts'],
-        triggerConfig: { type: 'webhook', webhookPath: '/webhook/urgent-alert' },
+        name: 'Automated Invoice Triage & Sheet Recording',
+        description: 'Monitors incoming billing emails, extracts invoice details via AI Agent, logs record into Google Sheets, and notifies Slack channel.',
+        tags: ['Finance', 'AI Agent', 'Sheets', 'Slack'],
+        triggerConfig: { type: 'gmail_trigger', filter: 'has:attachment invoice' },
         nodes: [
           {
             id: 'node_1',
             type: 'custom',
             position: { x: 100, y: 220 },
             data: {
-              label: 'Inbound Webhook Alert',
+              label: 'Gmail Invoice Ingestion',
               category: 'trigger',
-              icon: 'Zap',
-              provider: 'webhook',
-              action: 'receive_webhook',
-              config: { endpoint: '/api/v1/inbound-events' }
+              icon: 'Mail',
+              provider: 'gmail',
+              action: 'read_inbox',
+              config: { query: 'subject:Invoice OR subject:Bill', maxResults: 5 }
             }
           },
           {
@@ -391,12 +393,12 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             type: 'custom',
             position: { x: 420, y: 220 },
             data: {
-              label: 'AI Alert Formatter Agent',
+              label: 'AI Data Extraction Agent',
               category: 'ai_agent',
               icon: 'Sparkles',
               provider: 'ai',
               action: 'ai_process',
-              config: { prompt: 'Format urgent alert summary for instant messenger delivery' }
+              config: { prompt: 'Extract vendor name, invoice number, due date, and total amount as JSON.', model: 'auto' }
             }
           },
           {
@@ -404,12 +406,12 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             type: 'custom',
             position: { x: 740, y: 140 },
             data: {
-              label: 'WhatsApp Direct Message',
+              label: 'Google Sheets Audit Ledger',
               category: 'integration',
-              icon: 'MessageCircle',
-              provider: 'whatsapp',
-              action: 'send_message',
-              config: { to: '+1 (555) 019-2834', message: '🚨 *RUNA ALERT*: {{nodes.node_2.output.content}}' }
+              icon: 'Table',
+              provider: 'google-sheets',
+              action: 'append_row',
+              config: { spreadsheetId: '1Financial_Operations_Ledger_2026', range: 'Invoices!A:F', values: '{{nodes.node_2.output}}' }
             }
           },
           {
@@ -417,12 +419,12 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             type: 'custom',
             position: { x: 740, y: 320 },
             data: {
-              label: 'Telegram War Room Broadcast',
-              category: 'integration',
-              icon: 'Send',
-              provider: 'telegram',
-              action: 'send_alert',
-              config: { chatId: '@runa_incident_war_room', message: '⚡ *Incident Logged*: {{nodes.node_2.output.content}}' }
+              label: 'Slack Finance Dispatch',
+              category: 'messaging',
+              icon: 'MessageSquare',
+              provider: 'slack',
+              action: 'post_message',
+              config: { channel: '#finance-ops', message: '⚡ New Invoice parsed by AI Agent! Total: {{nodes.node_2.output.amount}}' }
             }
           }
         ],
@@ -434,68 +436,7 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
       };
     }
 
-    // 5. Email Digest & Slack Summary Template
-    if (p.includes('email') || p.includes('gmail') || p.includes('digest') || p.includes('summary')) {
-      return {
-        name: 'Executive Inbox AI Digest & Slack Dispatch',
-        description: 'Periodically reads critical unread emails, summarizes key action items via AI, and posts concise morning digest to Slack.',
-        tags: ['Gmail', 'AI Summarizer', 'Slack', 'Productivity'],
-        triggerConfig: { type: 'schedule', schedule: '0 9 * * 1-5' },
-        nodes: [
-          {
-            id: 'node_1',
-            type: 'custom',
-            position: { x: 100, y: 220 },
-            data: {
-              label: 'Gmail Unread Fetcher',
-              category: 'trigger',
-              icon: 'Mail',
-              provider: 'gmail',
-              action: 'read_inbox',
-              config: { query: 'is:unread label:important', maxResults: 10 }
-            }
-          },
-          {
-            id: 'node_2',
-            type: 'custom',
-            position: { x: 420, y: 220 },
-            data: {
-              label: 'AI Executive Summarizer',
-              category: 'ai_agent',
-              icon: 'Sparkles',
-              provider: 'ai',
-              action: 'summarize',
-              config: {
-                prompt: 'Summarize top 3 actionable items from these messages into bullet points with assigned priorities.',
-                model: 'auto'
-              }
-            }
-          },
-          {
-            id: 'node_3',
-            type: 'custom',
-            position: { x: 740, y: 220 },
-            data: {
-              label: 'Slack Executive Digest',
-              category: 'integration',
-              icon: 'MessageSquare',
-              provider: 'slack',
-              action: 'post_message',
-              config: {
-                channel: '#executive-briefing',
-                message: '🌅 *Daily Operations AI Digest*\n{{nodes.node_2.output.content}}'
-              }
-            }
-          }
-        ],
-        edges: [
-          { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
-          { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true }
-        ]
-      };
-    }
-
-    // 4. Default General Multi-Agent Operations Pipeline
+    // 4. Default Generic Multi-Agent Pipeline
     return {
       name: 'Omni-Channel Operations Automation',
       description: `Automated agentic workflow generated from prompt: "${prompt}"`,
@@ -511,8 +452,8 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
             category: 'trigger',
             icon: 'Zap',
             provider: 'webhook',
-            action: 'manual_trigger',
-            config: { payload: { initiatedBy: 'operator', timestamp: new Date().toISOString() } }
+            action: 'receive_webhook',
+            config: { endpoint: '/api/v1/events' }
           }
         },
         {
@@ -522,53 +463,29 @@ Return ONLY valid raw JSON, with no markdown code blocks.`;
           data: {
             label: 'AI Reasoning & Transform Agent',
             category: 'ai_agent',
-            icon: 'Cpu',
+            icon: 'Sparkles',
             provider: 'ai',
             action: 'ai_process',
-            config: {
-              prompt: `Execute operational reasoning for: ${prompt}`,
-              model: 'auto'
-            }
+            config: { prompt: `Execute operational reasoning for: ${prompt}`, model: 'auto' }
           }
         },
         {
           id: 'node_3',
           type: 'custom',
-          position: { x: 720, y: 140 },
+          position: { x: 720, y: 220 },
           data: {
             label: 'Slack Notification Dispatch',
-            category: 'integration',
+            category: 'messaging',
             icon: 'MessageSquare',
             provider: 'slack',
             action: 'post_message',
-            config: {
-              channel: '#operations',
-              message: '🤖 AI Automation Executed: {{nodes.node_2.output.content}}'
-            }
-          }
-        },
-        {
-          id: 'node_4',
-          type: 'custom',
-          position: { x: 720, y: 320 },
-          data: {
-            label: 'Audit Trail Ledger',
-            category: 'integration',
-            icon: 'Table',
-            provider: 'google-sheets',
-            action: 'append_row',
-            config: {
-              spreadsheetId: '1Audit_Log_Spreadsheet',
-              range: 'Audit!A:D',
-              values: '{{nodes.node_1.output.timestamp}}, {{nodes.node_2.output.category}}, SUCCESS'
-            }
+            config: { channel: '#operations', message: '🤖 AI Automation Executed: {{nodes.node_2.output.content}}' }
           }
         }
       ],
       edges: [
         { id: 'e1-2', source: 'node_1', target: 'node_2', animated: true },
-        { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true },
-        { id: 'e2-4', source: 'node_2', target: 'node_4', animated: true }
+        { id: 'e2-3', source: 'node_2', target: 'node_3', animated: true }
       ]
     };
   }
