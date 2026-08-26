@@ -2,6 +2,13 @@ const BaseIntegration = require('./baseIntegration');
 const axios = require('axios');
 const env = require('../config/env');
 
+const GEMINI_MODELS = [
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-1.5-flash',
+  'gemini-flash-latest'
+];
+
 class AIIntegration extends BaseIntegration {
   constructor() {
     super('ai');
@@ -19,7 +26,41 @@ class AIIntegration extends BaseIntegration {
     const { prompt = '', systemPrompt = '', inputData = {}, model = 'auto', temperature = 0.7 } = params;
     const apiKey = credentials?.apiKey || env.OPENROUTER_API_KEY || env.GEMINI_API_KEY;
 
-    // 1. Try OpenRouter if configured
+    // 1. Try Gemini if configured
+    if (env.GEMINI_API_KEY || (credentials?.provider === 'gemini' && credentials?.apiKey)) {
+      const geminiKey = credentials?.apiKey || env.GEMINI_API_KEY;
+      const targetModels = model !== 'auto' ? [model, ...GEMINI_MODELS] : GEMINI_MODELS;
+
+      for (const m of targetModels) {
+        try {
+          const response = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${geminiKey}`,
+            {
+              contents: [
+                {
+                  parts: [
+                    { text: `${systemPrompt ? systemPrompt + '\n\n' : ''}${prompt}\n\nInput Context:\n${JSON.stringify(inputData)}` }
+                  ]
+                }
+              ]
+            },
+            { timeout: 15000 }
+          );
+
+          const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          return {
+            content: text,
+            provider: 'gemini',
+            model: m,
+            timestamp: new Date().toISOString()
+          };
+        } catch (err) {
+          console.warn(`Gemini model ${m} call failed:`, err.response?.data?.error?.message || err.message);
+        }
+      }
+    }
+
+    // 2. Try OpenRouter if configured
     if (env.OPENROUTER_API_KEY || (credentials?.provider === 'openrouter' && credentials?.apiKey)) {
       try {
         const routerKey = credentials?.apiKey || env.OPENROUTER_API_KEY;
@@ -36,10 +77,10 @@ class AIIntegration extends BaseIntegration {
           {
             headers: {
               Authorization: `Bearer ${routerKey}`,
-              'HTTP-Referer': 'https://agentflow.ai',
-              'X-Title': 'Agentflow AI'
+              'HTTP-Referer': 'https://runa.ai',
+              'X-Title': 'RUNA AI'
             },
-            timeout: 20000
+            timeout: 15000
           }
         );
 
@@ -52,38 +93,7 @@ class AIIntegration extends BaseIntegration {
           timestamp: new Date().toISOString()
         };
       } catch (err) {
-        console.warn('OpenRouter call failed, falling back to Gemini / Heuristic:', err.message);
-      }
-    }
-
-    // 2. Try Gemini if configured
-    if (env.GEMINI_API_KEY || (credentials?.provider === 'gemini' && credentials?.apiKey)) {
-      try {
-        const geminiKey = credentials?.apiKey || env.GEMINI_API_KEY;
-        const geminiModel = model === 'auto' ? 'gemini-1.5-flash' : model;
-        const response = await axios.post(
-          `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${geminiKey}`,
-          {
-            contents: [
-              {
-                parts: [
-                  { text: `${systemPrompt ? systemPrompt + '\n\n' : ''}${prompt}\n\nInput Context:\n${JSON.stringify(inputData)}` }
-                ]
-              }
-            ]
-          },
-          { timeout: 20000 }
-        );
-
-        const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        return {
-          content: text,
-          provider: 'gemini',
-          model: geminiModel,
-          timestamp: new Date().toISOString()
-        };
-      } catch (err) {
-        console.warn('Gemini call failed, falling back to Heuristic Engine:', err.message);
+        console.warn('OpenRouter call failed:', err.message);
       }
     }
 
@@ -130,7 +140,7 @@ class AIIntegration extends BaseIntegration {
       category,
       sentiment,
       confidenceScore: score,
-      provider: 'agentflow-deterministic-ai',
+      provider: 'runa-deterministic-ai',
       mode: 'heuristic_engine',
       timestamp: new Date().toISOString()
     };
