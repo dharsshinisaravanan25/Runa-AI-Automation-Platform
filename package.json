@@ -1,0 +1,26 @@
+{
+  "name": "agentflow-ai",
+  "version": "1.0.0",
+  "description": "Agentic AI Operations Automation Platform (Agentflow_AI)",
+  "private": true,
+  "scripts": {
+    "dev": "node run-dev.js",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "build:client": "cd client && npm run build",
+    "start:server": "cd server && npm start",
+    "start:client": "cd client && npm start"
+  },
+  "keywords": [
+    "agentic-ai",
+    "automation",
+    "workflow",
+    "react-flow",
+    "langgraph",
+    "multi-agent",
+    "operations"
+  ],
+  "author": "Antigravity Engineering",
+  "license": "MIT"
+}
