@@ -34,7 +34,7 @@ export default function CanvasCopilot({
     {
       id: 'welcome',
       sender: 'copilot',
-      text: '👋 Hi! I am Runa Assist, your autonomous workflow co-pilot. Tell me what steps to add, connect, or configure and I will modify your canvas in real time!',
+      text: 'Hi, I am Runa Assist, your autonomous workflow co-pilot. Tell me what steps to add, connect, or configure and I will modify your canvas in real time.',
       timestamp: new Date()
     }
   ]);
@@ -101,7 +101,7 @@ export default function CanvasCopilot({
         {
           id: `error_${Date.now()}`,
           sender: 'copilot',
-          text: `⚠️ Runa Assist error: ${err.response?.data?.error?.message || err.message}`,
+          text: `Runa Assist error: ${err.response?.data?.error?.message || err.message}`,
           isError: true,
           timestamp: new Date()
         }
@@ -117,13 +117,13 @@ export default function CanvasCopilot({
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white font-semibold text-xs shadow-soft-xl hover:scale-105 active:scale-95 transition-all duration-200 group border border-white/20"
+          className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-soft-xl hover:scale-105 active:scale-95 transition-all duration-200 group border border-white/20"
         >
           <div className="p-1 rounded-lg bg-white/20">
-            <Sparkles className="w-4 h-4 text-white animate-pulse" />
+            <Sparkles className="w-4 h-4 text-white" />
           </div>
-          <span className="tracking-wide font-bold">✨ Runa Assist</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+          <span className="tracking-wide font-bold">Runa Assist</span>
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
         </button>
       )}
 
@@ -133,14 +133,14 @@ export default function CanvasCopilot({
           {/* Header */}
           <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 flex items-center justify-center text-white shadow-soft-sm">
+              <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-soft-sm">
                 <Sparkles className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                   <span>Runa Assist</span>
                   <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-100">
-                    Live
+                    Active
                   </span>
                 </h4>
                 <p className="text-[10px] text-slate-400">Autonomous workflow pair-architect</p>

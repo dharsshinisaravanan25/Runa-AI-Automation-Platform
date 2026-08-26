@@ -146,7 +146,7 @@ Output must strictly be valid JSON matching:
       }
 
       return {
-        reply: `⚡ I've added a WhatsApp Alert step configured for ${targetPhone} and automatically connected it to your workflow.`,
+        reply: `I have added a WhatsApp Alert step configured for ${targetPhone} and connected it to your workflow.`,
         actionTaken: 'GRAPH_UPDATED',
         nodes,
         edges
@@ -166,7 +166,7 @@ Output must strictly be valid JSON matching:
           icon: 'Send',
           provider: 'telegram',
           action: 'send_alert',
-          config: { chatId: '@runa_ops_channel', message: '⚡ Alert: {{nodes.node_2.output}}' }
+          config: { chatId: '@runa_ops_channel', message: 'Alert: {{nodes.node_2.output}}' }
         }
       });
 
@@ -175,7 +175,7 @@ Output must strictly be valid JSON matching:
       }
 
       return {
-        reply: `✈️ Added a Telegram alert node pointing to @runa_ops_channel and wired it into your DAG sequence.`,
+        reply: `Added a Telegram alert node pointing to @runa_ops_channel and wired it into your DAG sequence.`,
         actionTaken: 'GRAPH_UPDATED',
         nodes,
         edges
@@ -204,7 +204,7 @@ Output must strictly be valid JSON matching:
       }
 
       return {
-        reply: `📊 Added a Google Sheets logging step to record audit rows into your spreadsheet.`,
+        reply: `Added a Google Sheets logging step to record audit rows into your spreadsheet.`,
         actionTaken: 'GRAPH_UPDATED',
         nodes,
         edges
@@ -213,7 +213,7 @@ Output must strictly be valid JSON matching:
 
     // 4. General Assistance
     return {
-      reply: `🤖 I'm Runa Assist, your autonomous workflow co-pilot. You currently have ${nodes.length} nodes configured. You can ask me to add WhatsApp, Telegram, LinkedIn, Instagram, or Sheets nodes, or wire steps together automatically!`,
+      reply: `I am Runa Assist, your autonomous workflow co-pilot. You currently have ${nodes.length} nodes configured. You can ask me to add WhatsApp, Telegram, LinkedIn, Instagram, or Sheets nodes, or wire steps together automatically.`,
       actionTaken: 'CHAT_REPLY',
       nodes,
       edges
