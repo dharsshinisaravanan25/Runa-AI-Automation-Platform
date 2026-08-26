@@ -112,17 +112,17 @@ export default function CanvasCopilot({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-40 font-sans select-none">
+    <div className="fixed bottom-6 right-6 z-50 font-sans select-none">
       {/* Closed State Floating Launcher */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-xs shadow-soft-xl hover:scale-105 active:scale-95 transition-all duration-200 group"
+          className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-indigo-500 to-purple-600 text-white font-semibold text-xs shadow-soft-xl hover:scale-105 active:scale-95 transition-all duration-200 group border border-white/20"
         >
           <div className="p-1 rounded-lg bg-white/20">
             <Sparkles className="w-4 h-4 text-white animate-pulse" />
           </div>
-          <span className="tracking-wide">AI Canvas Co-Pilot</span>
+          <span className="tracking-wide font-bold">✨ AI Canvas Co-Pilot</span>
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
         </button>
       )}
